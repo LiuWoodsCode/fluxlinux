@@ -89,4 +89,25 @@ class BaseDesktopDefaultsTest {
         assertFalse(File(home, ".zshrc").exists())
         assertFalse(File(home, ".zprofile").exists())
     }
+
+    @Test
+    fun familyUserCreation_usesChosenUsername() {
+        val log = tmp.newFile("useradd.log")
+        val password = tmp.newFile("password.log")
+        val common = asset("scripts/common/setup/flux_guest_common.sh")
+        val script = tmp.newFile("create-user.sh").also {
+            it.writeText("""
+                FLUX_USER=teto
+                . '${common.absolutePath}'
+                id() { return 1; }
+                useradd() { printf '%s\n' "${'$'}*" >> '${log.absolutePath}'; }
+                chpasswd() { cat > '${password.absolutePath}'; }
+                usermod() { :; }
+                _flux_ensure_user
+            """.trimIndent())
+        }
+        run(script)
+        assertTrue(log.readText().contains("-m -u 1000 -s /bin/bash teto"))
+        assertEquals("teto:flux\n", password.readText())
+    }
 }
