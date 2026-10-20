@@ -155,7 +155,7 @@ fun DistroSettingsScreen(
                                         modifier = Modifier
                                             .size(8.dp)
                                             .clip(androidx.compose.foundation.shape.CircleShape)
-                                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(

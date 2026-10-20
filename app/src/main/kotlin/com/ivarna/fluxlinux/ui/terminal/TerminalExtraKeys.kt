@@ -292,7 +292,7 @@ private fun ModifierKey(
             // R5: LOCKED (long-press) gets an outline ring + badge dot so it is
             // visually distinct from a one-shot active modifier.
             .then(
-                if (locked) Modifier.border(2.dp, MaterialTheme.colorScheme.onPrimary)
+                if (locked) Modifier.border(2.dp, MaterialTheme.colorScheme.onPrimaryContainer)
                 else Modifier
             )
             .combinedClickable(onClick = onPress, onLongClick = onLongPress)
@@ -306,7 +306,7 @@ private fun ModifierKey(
                     .align(Alignment.TopEnd)
                     .padding(3.dp)
                     .size(6.dp)
-                    .background(MaterialTheme.colorScheme.onPrimary, CircleShape)
+                    .background(MaterialTheme.colorScheme.onPrimaryContainer, CircleShape)
             )
         }
     }

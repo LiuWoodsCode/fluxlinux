@@ -893,10 +893,10 @@ fun TermuxVersionAlertBanner() {
         modifier = Modifier
             .fillMaxWidth()
             .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
-            .background(androidx.compose.material3.MaterialTheme.colorScheme.error.copy(alpha = 0.15f))
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.errorContainer)
             .border(
                 width = 1.dp,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.error.copy(alpha = 0.6f),
+                color = androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
                 shape = androidx.compose.material3.MaterialTheme.shapes.medium
             )
             .padding(16.dp)

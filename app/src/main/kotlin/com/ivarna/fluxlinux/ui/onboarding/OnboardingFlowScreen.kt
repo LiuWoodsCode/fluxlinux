@@ -312,30 +312,7 @@ private fun WelcomePage(onNext: () -> Unit) {
 
             Spacer(Modifier.height(4.dp))
 
-            // Responsive Illustration Banner
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 130.dp)
-                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
-                    .background(colors.surface)
-                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium),
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.onboarding_bg_1),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
-                        )
-                )
-            }
+
         }
 
         Spacer(Modifier.height(16.dp))
@@ -1036,7 +1013,7 @@ private fun OptionsPage(
                                 modifier = Modifier
                                     .size(6.dp)
                                     .clip(CircleShape)
-                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary)
+                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer)
                             )
                             Spacer(Modifier.width(10.dp))
                             Text(
@@ -1211,7 +1188,7 @@ private fun DonePage(
                     .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                     .padding(3.dp)
                     .clip(CircleShape)
-                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary),
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -1318,7 +1295,7 @@ private fun StoragePage(onBack: () -> Unit, onNext: () -> Unit) {
                 modifier = Modifier
                     .size(84.dp)
                     .clip(CircleShape)
-                    .background((if (granted) success else androidx.compose.material3.MaterialTheme.colorScheme.primary).copy(alpha = 0.15f)),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

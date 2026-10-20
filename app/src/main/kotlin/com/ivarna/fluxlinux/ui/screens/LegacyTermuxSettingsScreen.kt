@@ -478,7 +478,7 @@ fun LegacyTermuxSettingsScreen(
                                 .fillMaxWidth()
                                 .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                                 .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
-                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), androidx.compose.material3.MaterialTheme.shapes.small)
+                                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.small)
                                 .padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
