@@ -30,8 +30,12 @@ add_custom_command(
         OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/xserver/GL/gl.h"
         COMMAND Python3::Interpreter "${CMAKE_CURRENT_SOURCE_DIR}/libepoxy/src/gen_dispatch.py"
         "--outputdir=${CMAKE_CURRENT_BINARY_DIR}/xserver/GL" "${CMAKE_CURRENT_SOURCE_DIR}/libepoxy/registry/gl.xml"
+        DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/libepoxy/src/gen_dispatch.py"
+                "${CMAKE_CURRENT_SOURCE_DIR}/libepoxy/registry/gl.xml"
+                "${CMAKE_CURRENT_SOURCE_DIR}/patches/libepoxy.patch"
         COMMENT "Generating source code (GL/gl.h)"
         VERBATIM)
+add_custom_target(xserver_gl_headers DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/xserver/GL/gl.h")
 
 set(inc "${CMAKE_CURRENT_BINARY_DIR}"
         "${CMAKE_CURRENT_BINARY_DIR}/xserver"
@@ -267,6 +271,7 @@ set(GLXVND_SOURCES
         vndcmds.c vndext.c vndservermapping.c vndservervendor.c)
 list(TRANSFORM GLXVND_SOURCES PREPEND "xserver/glx/")
 add_library(xserver_glxvnd STATIC ${GLXVND_SOURCES})
+add_dependencies(xserver_glxvnd xserver_gl_headers)
 target_include_directories(xserver_glxvnd PRIVATE ${inc})
 target_compile_options(xserver_glxvnd PRIVATE ${c_only_compile_options} ${compile_options})
 
