@@ -1,4 +1,6 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_debian_family.sh
 # Generic Post-install configuration for Debian-based Distros (Debian, Ubuntu, Kali, etc.)
 
@@ -27,23 +29,27 @@ printf '%s\n' virgl > /etc/fluxlinux/gpu_mode
 echo "FluxLinux: gpu_mode=virgl (first-paint; hw-accel may upgrade)"
 
 # 2. Create User 'flux'
-if ! id "flux" &>/dev/null; then
-    useradd -m -s /bin/bash flux
-    echo "flux:flux" | chpasswd
-    usermod -aG sudo flux
+if command -v _flux_ensure_en_us_locale >/dev/null 2>&1; then
+    _flux_ensure_en_us_locale || true
+fi
+
+if ! id "${FLUX_USER}" &>/dev/null; then
+    useradd -m -s /bin/bash ${FLUX_USER}
+    echo "${FLUX_USER}:flux" | chpasswd
+    usermod -aG sudo ${FLUX_USER}
 fi
 
 # 3. Configure Sudo
-echo "flux ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/flux
+echo "${FLUX_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${FLUX_USER}
 
 # 4. Configure VNC for User
-mkdir -p /home/flux/.vnc
+mkdir -p /home/${FLUX_USER}/.vnc
 echo "#!/bin/bash
 export PULSE_SERVER=tcp:127.0.0.1
 xrdb $HOME/.Xresources
-startxfce4" > /home/flux/.vnc/xstartup
-chmod +x /home/flux/.vnc/xstartup
-chown -R flux:flux /home/flux/.vnc
+startxfce4" > /home/${FLUX_USER}/.vnc/xstartup
+chmod +x /home/${FLUX_USER}/.vnc/xstartup
+chown -R ${FLUX_USER}:$(id -gn "${FLUX_USER}") /home/${FLUX_USER}/.vnc
 
 if command -v _flux_write_pulse_client >/dev/null 2>&1; then
     _flux_write_pulse_client

@@ -1,10 +1,12 @@
 #!/bin/sh
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_customization_alpine.sh
 # FluxLinux branding for Alpine XFCE4 (proot + chroot).
 # apk/musl port of setup_customization_debian.sh core path.
 
-CUSTOM_USER="flux"
-CUSTOM_GROUP="flux"
+CUSTOM_USER="${FLUX_USER}"
+CUSTOM_GROUP="${FLUX_USER}"
 USER_HOME="/home/$CUSTOM_USER"
 THEME_DIR="/usr/share/themes"
 ICON_DIR="/usr/share/icons"
@@ -487,5 +489,6 @@ chmod 666 /lib/apk/db/lock 2>/dev/null || true
 touch /var/log/apk.log 2>/dev/null || true
 chmod 666 /var/log/apk.log 2>/dev/null || true
 
+rm -f /etc/fluxlinux/base-desktop
 echo "FluxLinux: Alpine XFCE4 Customization complete!"
 exit 0

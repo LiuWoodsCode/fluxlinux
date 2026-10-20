@@ -10,6 +10,27 @@ import kotlin.io.path.createTempDirectory
 class GuestZshrcRepairTest {
 
     @Test
+    fun baseDesktop_doesNotCreateOrRewriteShellProfiles() {
+        val dir = createTempDirectory("base-desktop").toFile()
+        try {
+            val ctx = FakeContext(dir, "/fake/jni")
+            val rootfs = File(dir, "usr/var/lib/proot-distro/containers/debian/rootfs")
+            File(rootfs, "etc/fluxlinux").mkdirs()
+            File(rootfs, "etc/fluxlinux/base-desktop").writeText("")
+            val home = File(rootfs, "home/flux").also { it.mkdirs() }
+            GuestZshrcRepair.repairIfNeeded(ctx, "proot", "debian")
+            assertFalse(File(home, ".zshrc").exists())
+            assertFalse(File(home, ".zprofile").exists())
+            val zshrc = File(home, ".zshrc").also { it.writeText("# my own shell setup\n") }
+            GuestZshrcRepair.repairIfNeeded(ctx, "proot", "debian")
+            assertEquals("# my own shell setup\n", zshrc.readText())
+            assertFalse(File(home, ".local/share/fastfetch").exists())
+        } finally {
+            dir.deleteRecursively()
+        }
+    }
+
+    @Test
     fun resolveProotName_alpineAndDebian() {
         assertEquals("alpine", GuestZshrcRepair.resolveProotName("alpine"))
         assertEquals("alpine", GuestZshrcRepair.resolveProotName("alpine_chroot"))

@@ -265,6 +265,7 @@ object DesktopLauncher {
         val envMap = HashMap<String, String>()
         RootShell.cachedBusyBox()?.let { envMap["FLUX_BB"] = it }
         envMap["FLUX_DESKTOP"] = desktopType
+        envMap["FLUX_USER"] = com.ivarna.fluxlinux.core.utils.GuestUser.get(app, distroId)
         gpuRuntime?.let { envMap["FLUX_GPU_RUNTIME"] = it }
 
         guiShellJob = ShellCommandRunner.runStreamedCancelable(

@@ -1,4 +1,6 @@
 #!/bin/sh
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 
 # Helpers live in flux_guest_common.sh (prepended by flux_install /
 # familySetupPayload). Source it only when this file is run standalone.
@@ -163,7 +165,7 @@ fi
 _flux_log "Installing base + XFCE packages (targeted — no xfce4 group first)..."
 if ! pacman -S --noconfirm --needed \
     sudo \
-    git zsh python sed gzip \
+    git python sed gzip \
     xfce4-session xfce4-panel xfce4-settings xfce4-terminal \
     xfdesktop xfwm4 thunar \
     ttf-dejavu adwaita-icon-theme \
@@ -181,25 +183,25 @@ fi
 _flux_ensure_dbus
 
 # User alarm occupies uid 1000. Prefer rename so home/files stay.
-if id alarm >/dev/null 2>&1 && ! id flux >/dev/null 2>&1; then
-    _flux_log "Renaming alarm → flux (uid 1000)"
-    usermod -l flux -d /home/flux -m alarm 2>/dev/null \
+if id alarm >/dev/null 2>&1 && ! id ${FLUX_USER} >/dev/null 2>&1; then
+    _flux_log "Renaming alarm → ${FLUX_USER} (uid 1000)"
+    usermod -l ${FLUX_USER} -d /home/${FLUX_USER} -m alarm 2>/dev/null \
         || { userdel -r alarm 2>/dev/null || true; }
 fi
 # Chroot can leave both (usermod -l no-op + useradd flux=1001). One uid 1000.
-if id alarm >/dev/null 2>&1 && id flux >/dev/null 2>&1; then
-    _flux_log "Removing leftover alarm (flux already exists)"
+if [ "$FLUX_USER" != alarm ] && id alarm >/dev/null 2>&1 && id ${FLUX_USER} >/dev/null 2>&1; then
+    _flux_log "Removing leftover alarm (${FLUX_USER} already exists)"
     userdel -r alarm 2>/dev/null || userdel alarm 2>/dev/null || true
 fi
-if id flux >/dev/null 2>&1 && ! id -u 1000 >/dev/null 2>&1; then
-    usermod -u 1000 -d /home/flux flux 2>/dev/null || true
+if id ${FLUX_USER} >/dev/null 2>&1 && ! id -u 1000 >/dev/null 2>&1; then
+    usermod -u 1000 -d /home/${FLUX_USER} ${FLUX_USER} 2>/dev/null || true
 fi
 
 _flux_require_startxfce4
 _flux_ensure_user
-echo "flux:flux" | chpasswd 2>/dev/null || true
+echo "${FLUX_USER}:flux" | chpasswd 2>/dev/null || true
 if command -v usermod >/dev/null 2>&1; then
-    usermod -aG wheel,audio,video,input,users flux 2>/dev/null || true
+    usermod -aG wheel,audio,video,input,users ${FLUX_USER} 2>/dev/null || true
 fi
 _flux_ensure_sudo
 _flux_ensure_home

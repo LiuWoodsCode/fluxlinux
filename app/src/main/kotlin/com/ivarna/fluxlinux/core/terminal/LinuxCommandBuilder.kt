@@ -1,6 +1,7 @@
 package com.ivarna.fluxlinux.core.terminal
 
 import android.content.Context
+import com.ivarna.fluxlinux.core.utils.GuestUser
 
 /** Entry point for building terminal commands.
  *  Delegates to ProotCommandBuilder or ChrootCommandBuilder based on method.
@@ -39,11 +40,12 @@ object LinuxCommandBuilder {
         val profile = distroId?.let {
             com.ivarna.fluxlinux.core.install.DistroInstallProfile.forId(it)
         }
+        val loginUser = if (user == "flux") GuestUser.get(ctx, distroId) else GuestUser.requireLogin(user)
         return when (method) {
             "chroot" -> ChrootCommandBuilder.build(
                 ctx,
                 shellCmd,
-                user,
+                loginUser,
                 chrootPath = profile?.chrootPath
                     ?: com.ivarna.fluxlinux.core.root.ChrootPaths.CHROOT_PATH,
                 loginShell = loginShell
@@ -51,7 +53,7 @@ object LinuxCommandBuilder {
             else -> ProotCommandBuilder.build(
                 ctx,
                 shellCmd,
-                user,
+                loginUser,
                 useSharedTmp,
                 distro = profile?.prootName ?: "debian",
                 loginShell = loginShell ?: GuestLoginShell.DEFAULT

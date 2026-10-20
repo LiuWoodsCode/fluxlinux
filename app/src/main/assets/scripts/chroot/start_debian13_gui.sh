@@ -15,7 +15,14 @@ if [ -z "${TARGET_PREFIX:-}" ]; then
     TARGET_PREFIX="/data/data/com.ivarna.fluxlinux/files/usr"
   fi
 fi
-USERNAME="${USERNAME:-flux}"
+if [ -r "$DEBIANPATH/etc/fluxlinux/username" ]; then
+  USERNAME=$(cat "$DEBIANPATH/etc/fluxlinux/username")
+else
+  USERNAME="${FLUX_USER:-${USERNAME:-flux}}"
+fi
+case "$USERNAME" in
+  ''|[!a-z_]*|*[!a-z0-9_-]*|root) echo "FluxLinux: Invalid username" >&2; exit 1 ;;
+esac
 
 echo "========================================"
 echo "FluxLinux: Chroot XFCE (root stage)"

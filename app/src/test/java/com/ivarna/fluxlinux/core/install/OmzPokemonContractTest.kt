@@ -7,8 +7,8 @@ import java.io.File
 
 /**
  * Locks the OMZ + pokemon-colorscripts contract for Deepin / Chimera / Manjaro:
- * guest script must try (not skip-by-default), runner must not hardcode skip=1,
- * and chroot payload must export skip=0 (no host git).
+ * Optional customization scripts install these extras when explicitly requested.
+ * Onboarding must leave them out.
  */
 class OmzPokemonContractTest {
 
@@ -48,20 +48,28 @@ class OmzPokemonContractTest {
     }
 
     @Test
-    fun onboardingRunner_doesNotHardcodePokemonSkip() {
+    fun onboardingRunner_leavesShellAndThemeExtrasOptIn() {
         val text = repoFile(
             "src/main/kotlin/com/ivarna/fluxlinux/core/install/OnboardingInstallRunner.kt"
         ).readText()
-        assertFalse(text.contains("FLUX_SKIP_POKEMON=1"))
-        assertTrue(text.contains("FLUX_SKIP_POKEMON=0"))
+        assertFalse(text.contains("FLUX_SKIP_POKEMON"))
+        assertFalse(text.contains("ProotZshBootstrap.install"))
+        assertFalse(text.contains("ProotXfceAssetInstaller.install"))
+        assertFalse(text.contains("profile.customizationScript"))
+        assertFalse(text.contains("customizationPayload("))
+        assertFalse(text.contains("\"customization\", true"))
+        assertTrue(text.contains("BaseDesktopDefaults.SCRIPT"))
+        assertTrue(text.contains("runHwAccelIfPresent("))
     }
 
     @Test
-    fun chrootPayload_exportsPokemonTry() {
+    fun basePayload_omitsCosmeticSetup() {
         val text = repoFile(
             "src/main/kotlin/com/ivarna/fluxlinux/core/install/BaseDesktopInstallPlan.kt"
         ).readText()
-        assertTrue(text.contains("FLUX_SKIP_POKEMON='0'"))
+        assertFalse(text.contains("FLUX_SKIP_POKEMON"))
+        assertFalse(text.contains("fun customizationPayload"))
+        assertFalse(text.contains("FLUX_THEME"))
     }
 
     @Test
@@ -75,19 +83,22 @@ class OmzPokemonContractTest {
     }
 
     @Test
-    fun dcmFamilies_installGitZshPython() {
+    fun dcmFamilies_installToolsWithoutShellExtras() {
         val deepin = repoFile(
             "src/main/assets/scripts/deepin/common/setup/setup_deepin_family.sh"
         ).readText()
-        assertTrue(deepin.contains("git zsh python3"))
+        assertTrue(deepin.contains("git python3"))
         val chimera = repoFile(
             "src/main/assets/scripts/chimera/common/setup/setup_chimera_family.sh"
         ).readText()
-        assertTrue(chimera.contains("git zsh python"))
+        assertTrue(chimera.contains("git python"))
         val manjaro = repoFile(
             "src/main/assets/scripts/manjaro/common/setup/setup_manjaro_family.sh"
         ).readText()
-        assertTrue(manjaro.contains("git zsh python"))
+        assertTrue(manjaro.contains("git python"))
+        assertFalse(deepin.contains("git zsh"))
+        assertFalse(chimera.contains("cmd:zsh"))
+        assertFalse(manjaro.contains("git zsh"))
         assertTrue(
             "CheckSpace must be disabled before first pacman -S (no sed)",
             manjaro.contains("_flux_disable_checkspace")
@@ -98,8 +109,8 @@ class OmzPokemonContractTest {
         )
         assertTrue(manjaro.contains("dbus-broker-units"))
         assertTrue(manjaro.contains("python sed gzip"))
-        assertTrue(
-            "family install must ship fastfetch so the shell always has it",
+        assertFalse(
+            "fastfetch should remain an optional extra",
             manjaro.contains("fastfetch")
         )
         assertTrue(manjaro.contains("_flux_ensure_locale"))
@@ -211,7 +222,7 @@ class OmzPokemonContractTest {
         val proot = repoFile(
             "src/main/assets/scripts/debian/proot/start/start_gui.sh"
         ).readText()
-        assertTrue(proot.contains("XDG_RUNTIME_DIR=/home/flux/.cache/runtime"))
+        assertTrue(proot.contains("XDG_RUNTIME_DIR=/home/\${FLUX_USER}/.cache/runtime"))
         assertFalse(proot.contains("XDG_RUNTIME_DIR=/tmp/runtime-flux"))
     }
 

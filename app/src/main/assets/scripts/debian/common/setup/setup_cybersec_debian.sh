@@ -1,4 +1,6 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_cybersec_debian.sh
 # Installs Cybersecurity & Penetration Testing Stack
 # Target: Debian 13 (Trixie) ARM64
@@ -46,8 +48,8 @@ if [ "$1" = "uninstall" ]; then
     # Don't touch /opt/burpsuite — user may have manually placed the JAR there
 
     # Remove flux user from wireshark group (cleanup)
-    if id "flux" &>/dev/null; then
-        gpasswd -d flux wireshark 2>/dev/null || true
+    if id "${FLUX_USER}" &>/dev/null; then
+        gpasswd -d ${FLUX_USER} wireshark 2>/dev/null || true
     fi
 
     echo "FluxLinux: Cybersecurity Environment Uninstalled."
@@ -67,7 +69,7 @@ handle_error() {
 }
 
 echo "FluxLinux: Setting up Cybersecurity Environment..."
-TARGET_USER="flux"
+TARGET_USER="${FLUX_USER}"
 TARGET_GROUP="users"
 
 # 1. System Dependencies & Core Tools

@@ -3,6 +3,7 @@ package com.ivarna.fluxlinux.core.terminal
 import android.content.Context
 import android.util.Log
 import com.ivarna.fluxlinux.core.root.ChrootPaths
+import com.ivarna.fluxlinux.core.utils.GuestUser
 import java.io.File
 
 /**
@@ -137,6 +138,8 @@ fi
         if (prefs.getBoolean(cacheKey, false)) return
         val zshrc = resolveZshrc(ctx, method, distroId) ?: return
         val rootfs = zshrc.parentFile?.parentFile?.parentFile // home/flux/.zshrc → rootfs
+        // Fresh base installs own their shell setup, including user-written dotfiles.
+        if (rootfs != null && File(rootfs, "etc/fluxlinux/base-desktop").isFile) return
         val isApkGuest = isApkGuest(distroId)
         val needsPmWrap = !isApkGuest && isGlibcGuest(distroId)
         try {
@@ -365,6 +368,7 @@ exit 1
      * Proot rootfs under app filesDir is usually writable; chroot may skip.
      */
     internal fun ensureFluxLoginShellZsh(rootfs: File) {
+        val username = GuestUser.inRootfs(rootfs)
         val zshBin = when {
             File(rootfs, "bin/zsh").isFile -> "/bin/zsh"
             File(rootfs, "usr/bin/zsh").isFile -> "/usr/bin/zsh"
@@ -376,7 +380,7 @@ exit 1
             val lines = passwd.readLines()
             var changed = false
             val out = lines.map { line ->
-                if (!line.startsWith("flux:")) return@map line
+                if (!line.startsWith("$username:")) return@map line
                 val parts = line.split(":").toMutableList()
                 if (parts.size < 7) return@map line
                 val current = parts[6]
@@ -401,13 +405,13 @@ exit 1
                     distroId != null -> ChrootPaths.pathForDistro(distroId)
                     else -> ChrootPaths.CHROOT_PATH
                 }
-                File(root, "home/flux/.zshrc")
+                File(root, "home/${GuestUser.get(ctx, distroId)}/.zshrc")
             }
             "proot" -> {
                 val prootName = resolveProotName(distroId)
                 File(
                     ctx.filesDir,
-                    "usr/var/lib/proot-distro/containers/$prootName/rootfs/home/flux/.zshrc"
+                    "usr/var/lib/proot-distro/containers/$prootName/rootfs/home/${GuestUser.get(ctx, distroId)}/.zshrc"
                 )
             }
             else -> null

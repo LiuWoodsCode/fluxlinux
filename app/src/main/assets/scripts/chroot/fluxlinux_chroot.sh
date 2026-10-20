@@ -1,5 +1,5 @@
 #!/system/bin/sh
-# fluxlinux-chroot v2.9
+# fluxlinux-chroot v3.0
 # SSOT chroot runner for NativeCode Debian 13 (requires root).
 # Do not nest this under run_debian13_root.sh — it already owns mounts + one chroot.
 # Guest entry always uses env -i + Debian PATH (never Android /system PATH).
@@ -17,7 +17,7 @@
 #   FLUX_CHROOT  FLUX_PACKAGE  FLUX_HOST_TMP  FLUX_PREFIX  FLUX_BB  FLUX_SHELL
 set -u
 
-VERSION_STR="fluxlinux-chroot v2.9"
+VERSION_STR="fluxlinux-chroot v3.0"
 # Prefer caller-pinned env (RootShell / start_gui). Fallbacks cover both store flavors.
 if [ -z "${FLUX_PACKAGE:-}" ]; then
   if [ -d /data/data/com.zenithblue.fluxlinux/files/usr ]; then
@@ -30,7 +30,7 @@ FLUX_CHROOT="${FLUX_CHROOT:-/data/local/tmp/chrootDebian13}"
 FLUX_HOST_TMP="${FLUX_HOST_TMP:-/data/data/${FLUX_PACKAGE}/files/usr/tmp}"
 FLUX_PREFIX="${FLUX_PREFIX:-/data/data/${FLUX_PACKAGE}/files/usr}"
 LOGIN_SHELL="${FLUX_SHELL:-zsh}"
-USER_NAME="flux"
+USER_NAME="${FLUX_USER:-flux}"
 LOGIN_WORKDIR=""
 WANT_X11=0
 MODE=""
@@ -284,7 +284,7 @@ guest_path_for_user() {
   if [ "$USER_NAME" = "root" ]; then
     printf '%s' "$GUEST_PATH_ROOT"
   else
-    printf '%s' "/home/flux/.local/bin:/home/flux/bin:/home/flux/.cargo/bin:/opt/nodejs/bin:$GUEST_PATH_ROOT"
+    printf '%s' "/home/${USER_NAME}/.local/bin:/home/${USER_NAME}/bin:/home/${USER_NAME}/.cargo/bin:/opt/nodejs/bin:$GUEST_PATH_ROOT"
   fi
 }
 
@@ -298,7 +298,7 @@ build_guest_env_args() {
   if [ "$USER_NAME" = "root" ]; then
     GUEST_ENV_ARGS="PATH=$_gp HOME=/root USER=root LOGNAME=root TERM=$_term LANG=$_lang TMPDIR=/tmp XDG_RUNTIME_DIR=/tmp PULSE_SERVER=tcp:127.0.0.1 DEBIAN_FRONTEND=noninteractive"
   else
-    GUEST_ENV_ARGS="PATH=$_gp HOME=/home/flux USER=flux LOGNAME=flux NVM_DIR=/home/flux/.nvm TERM=$_term LANG=$_lang TMPDIR=/tmp XDG_RUNTIME_DIR=/tmp PULSE_SERVER=tcp:127.0.0.1 DEBIAN_FRONTEND=noninteractive"
+    GUEST_ENV_ARGS="PATH=$_gp HOME=/home/${USER_NAME} USER=$USER_NAME LOGNAME=$USER_NAME NVM_DIR=/home/${USER_NAME}/.nvm TERM=$_term LANG=$_lang TMPDIR=/tmp XDG_RUNTIME_DIR=/tmp PULSE_SERVER=tcp:127.0.0.1 DEBIAN_FRONTEND=noninteractive"
   fi
 }
 
@@ -422,8 +422,10 @@ resolve_login_shell() {
 
 # Seed Flux zsh profile when customization never wrote one (Alpine chroot).
 ensure_flux_zsh_profile() {
-  [ "$USER_NAME" = "flux" ] || return 0
-  _home="$FLUX_CHROOT/home/flux"
+  # Base installs keep stock or user-written shell profiles.
+  [ ! -f "$FLUX_CHROOT/etc/fluxlinux/base-desktop" ] || return 0
+  [ "$USER_NAME" != "root" ] || return 0
+  _home="$FLUX_CHROOT/home/${USER_NAME}"
   [ -d "$_home" ] || return 0
   if [ ! -f "$_home/.zshrc" ]; then
     cat > "$_home/.zshrc" <<'ZSHRC'
@@ -481,9 +483,9 @@ ZSHRC
       > "$_home/.zprofile"
   fi
   if [ -x "$FLUX_CHROOT/bin/zsh" ] && [ -f "$FLUX_CHROOT/etc/passwd" ] && \
-     grep -q '^flux:' "$FLUX_CHROOT/etc/passwd" && \
-     ! grep -q '^flux:.*zsh$' "$FLUX_CHROOT/etc/passwd"; then
-    sed -i 's|^\(flux:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*\):.*|\1:/bin/zsh|' \
+     grep -q "^$USER_NAME:" "$FLUX_CHROOT/etc/passwd" && \
+     ! grep -q "^$USER_NAME:.*zsh$" "$FLUX_CHROOT/etc/passwd"; then
+    sed -i "s|^\(${USER_NAME}:[^:]*:[^:]*:[^:]*:[^:]*:[^:]*\):.*|\1:/bin/zsh|" \
       "$FLUX_CHROOT/etc/passwd" 2>/dev/null || true
   fi
   chown --reference="$_home" "$_home/.zshrc" "$_home/.zprofile" 2>/dev/null || true
@@ -626,6 +628,18 @@ parse_common_flags() {
   REMAINING_ARGS=""
 }
 
+# Resolve the distro account for legacy callers that still request flux.
+resolve_guest_user() {
+  if [ "$USER_NAME" = "flux" ] && [ -r "$FLUX_CHROOT/etc/fluxlinux/username" ]; then
+    USER_NAME=$(cat "$FLUX_CHROOT/etc/fluxlinux/username")
+  fi
+  [ "$USER_NAME" = "root" ] && return 0
+  case "$USER_NAME" in
+    ''|[!a-z_]*|*[!a-z0-9_-]*) die "invalid username" ;;
+  esac
+  [ "${#USER_NAME}" -le 32 ] || die "username too long"
+}
+
 # --- main ---
 [ "$#" -ge 1 ] || usage
 MODE="$1"
@@ -647,7 +661,7 @@ resolve_bb || die "root-capable busybox not found"
 # Flag parse: collect until -- or end; modes sh/exec/b64 need --
 REMAINING_ARGS=""
 WANT_X11=0
-USER_NAME="flux"
+USER_NAME="${FLUX_USER:-flux}"
 LOGIN_SHELL="${FLUX_SHELL:-zsh}"
 
 case "$MODE" in
@@ -681,7 +695,7 @@ case "$MODE" in
         *) die "login: unknown arg $1" ;;
       esac
     done
-    case "$USER_NAME" in root|flux) ;; *) die "user must be flux|root" ;; esac
+    resolve_guest_user
     ensure_mounts
     guest_login
     ;;
@@ -700,7 +714,7 @@ case "$MODE" in
           ;;
       esac
     done
-    case "$USER_NAME" in root|flux) ;; *) die "user must be flux|root" ;; esac
+    resolve_guest_user
     [ "$#" -ge 1 ] || die "sh requires a shell string"
     # Join remaining as one command string (caller may pass one quoted arg)
     CMD_STR="$*"
@@ -719,7 +733,7 @@ case "$MODE" in
         *) break ;;
       esac
     done
-    case "$USER_NAME" in root|flux) ;; *) die "user must be flux|root" ;; esac
+    resolve_guest_user
     [ "$#" -ge 1 ] || die "exec requires CMD"
     ensure_mounts
     guest_exec "$@"
@@ -736,7 +750,7 @@ case "$MODE" in
         *) break ;;
       esac
     done
-    case "$USER_NAME" in root|flux) ;; *) die "user must be flux|root" ;; esac
+    resolve_guest_user
     [ "$#" -ge 1 ] || die "b64 requires payload"
     B64_PAYLOAD="$1"
     ensure_mounts

@@ -496,7 +496,7 @@ object RootShell {
         context: Context? = null
     ) {
         context?.let { ensureChrootHelper(it) }
-        val u = if (user == "root") "root" else "flux"
+        val u = com.ivarna.fluxlinux.core.utils.GuestUser.requireLogin(user)
         val b64 = android.util.Base64.encodeToString(
             cmd.toByteArray(Charsets.UTF_8),
             android.util.Base64.NO_WRAP
@@ -518,7 +518,7 @@ object RootShell {
         processHolder: AtomicReference<Process?>? = null
     ): CaptureResult {
         context?.let { ensureChrootHelper(it) }
-        val u = if (user == "root") "root" else "flux"
+        val u = com.ivarna.fluxlinux.core.utils.GuestUser.requireLogin(user)
         val b64 = android.util.Base64.encodeToString(
             cmd.toByteArray(Charsets.UTF_8),
             android.util.Base64.NO_WRAP

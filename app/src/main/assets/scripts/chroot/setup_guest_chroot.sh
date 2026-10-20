@@ -9,7 +9,7 @@
 #   TERMUX_APP__PACKAGE_NAME, TERMUX__HOME
 
 GUESTPATH="${FLUX_CHROOT:-/data/local/tmp/chrootGuest}"
-USERNAME="flux"
+USERNAME="${FLUX_USER:-flux}"
 DISTRO_LABEL="${FLUX_DISTRO_LABEL:-guest}"
 
 PKG="${TERMUX_APP__PACKAGE_NAME:-com.ivarna.fluxlinux}"
@@ -303,7 +303,7 @@ fi
 
     if [ -f "$GUESTPATH/.flux_configured" ] && \
        { [ -e "$GUESTPATH/bin/bash" ] || [ -e "$GUESTPATH/usr/bin/bash" ]; } && \
-       grep -q '^flux:' "$GUESTPATH/etc/passwd" 2>/dev/null; then
+       grep -q "^$USERNAME:" "$GUESTPATH/etc/passwd" 2>/dev/null; then
         success "$DISTRO_LABEL Chroot already installed."
         progress "VERIFY: chroot present at $GUESTPATH"
         am start -a android.intent.action.VIEW \

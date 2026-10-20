@@ -94,7 +94,7 @@ Twelve guests. **Every one** installs as **PRoot** (no root) or **Chroot** (root
 | <img src="app/src/main/res/drawable/distro_parrot.webp" width="28"/> | **Parrot** | 7.2 | apt | ✓ | ✓ | ✓ | ✓ |
 | <img src="app/src/main/res/drawable/distro_arch.webp" width="28"/> | **Arch** | ARM | pacman | ✓ | ✓ | ✓ | ✓ |
 
-Debian also ships the optional extra stacks (KDE Plasma, app/web/data/game/office/graphics). The other eleven use the shared XFCE4 + GPU + theme path.
+Fresh installs provide base XFCE4, GPU/X11/audio support, and the Kasane Teto wallpaper set to fill. Themes, icons, cursors, fonts, and shell enhancements are optional in Distro Settings. Debian also offers extra stacks (KDE Plasma, app/web/data/game/office/graphics).
 
 Per-distro notes: [docs/distro/](docs/distro/).
 
@@ -123,7 +123,7 @@ Modern Android hardware is powerful enough to run desktop workloads, but the sof
 | 🔓 **Rootless Mode** | Works on any Android 8+ device via PRoot |
 | ⚡ **Turbo Mode** | Native chroot for rooted devices (Magisk / KernelSU / APatch BusyBox) |
 | 🎮 **GPU Acceleration** | Turnip (Adreno) + VirGL for graphics |
-| 🎨 **Custom Themes** | XFCE4 Space theme, Papirus icons, wallpapers |
+| 🎨 **Optional Custom Themes** | Install XFCE4 Space themes, Papirus icons, and shell enhancements from Distro Settings |
 | 📦 **Dev Stacks** | Extra Debian environments for coding, office, and graphics |
 
 ---

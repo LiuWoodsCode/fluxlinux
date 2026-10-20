@@ -1,4 +1,6 @@
 #!/bin/sh
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_alpine_family.sh
 # Post-install base desktop for Alpine (proot + chroot). apk + musl.
 # Creates user flux, installs XFCE4. Must run as root inside the guest.
@@ -128,31 +130,31 @@ BWRAP_EOF
 chmod 755 /usr/bin/bwrap
 
 # 5. User flux (prefer uid 1000 when free — matches common XFCE defaults)
-if ! id flux >/dev/null 2>&1; then
+if ! id ${FLUX_USER} >/dev/null 2>&1; then
     echo "FluxLinux: Creating user flux..."
     if command -v useradd >/dev/null 2>&1; then
         if ! id -u 1000 >/dev/null 2>&1; then
-            useradd -m -u 1000 -s /bin/bash flux 2>/dev/null \
-                || useradd -m -s /bin/bash flux 2>/dev/null \
-                || useradd -m -s /bin/sh flux
+            useradd -m -u 1000 -s /bin/bash ${FLUX_USER} 2>/dev/null \
+                || useradd -m -s /bin/bash ${FLUX_USER} 2>/dev/null \
+                || useradd -m -s /bin/sh ${FLUX_USER}
         else
-            useradd -m -s /bin/bash flux 2>/dev/null || useradd -m -s /bin/sh flux
+            useradd -m -s /bin/bash ${FLUX_USER} 2>/dev/null || useradd -m -s /bin/sh ${FLUX_USER}
         fi
     else
-        adduser -D -s /bin/sh flux
+        adduser -D -s /bin/sh ${FLUX_USER}
     fi
-    echo "flux:flux" | chpasswd 2>/dev/null || true
+    echo "${FLUX_USER}:flux" | chpasswd 2>/dev/null || true
 fi
 
 # Groups (best-effort — names differ slightly across Alpine releases)
 for g in wheel audio video netdev input; do
-    addgroup flux "$g" 2>/dev/null || true
+    addgroup ${FLUX_USER} "$g" 2>/dev/null || true
 done
 
 # 6. Sudo NOPASSWD
 mkdir -p /etc/sudoers.d
-echo "flux ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/flux
-chmod 0440 /etc/sudoers.d/flux
+echo "${FLUX_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${FLUX_USER}
+chmod 0440 /etc/sudoers.d/${FLUX_USER}
 # Alpine ships @includedir; re-assert if a minimal sudoers was replaced
 if [ -f /etc/sudoers ] && ! grep -qE '@includedir[[:space:]]+/etc/sudoers\.d' /etc/sudoers 2>/dev/null; then
     echo '@includedir /etc/sudoers.d' >> /etc/sudoers
@@ -160,15 +162,15 @@ fi
 chmod 4755 /usr/bin/sudo 2>/dev/null || true
 
 # 7. Optional VNC xstartup parity with Debian family
-if id flux >/dev/null 2>&1; then
-    mkdir -p /home/flux/.vnc
-    cat > /home/flux/.vnc/xstartup <<'EOF'
+if id ${FLUX_USER} >/dev/null 2>&1; then
+    mkdir -p /home/${FLUX_USER}/.vnc
+    cat > /home/${FLUX_USER}/.vnc/xstartup <<'EOF'
 #!/bin/sh
 export PULSE_SERVER=tcp:127.0.0.1
 [ -f "$HOME/.Xresources" ] && xrdb "$HOME/.Xresources"
 exec startxfce4
 EOF
-    chmod +x /home/flux/.vnc/xstartup
+    chmod +x /home/${FLUX_USER}/.vnc/xstartup
 fi
 if command -v _flux_write_pulse_client >/dev/null 2>&1; then
     _flux_write_pulse_client
@@ -194,17 +196,17 @@ fi
 # Ensure home ownership / writability.
 # Proot: host process is the Android app uid; chown to flux's guest uid (e.g.
 # 10302) can make mode-700 dirs unwritable on disk → xfconfd failsafe.
-# Prefer matching /home owner (app uid under proot), then best-effort flux:flux.
-if [ -d /home/flux ]; then
+# Prefer matching /home owner (app uid under proot), then best-effort ${FLUX_USER}:flux.
+if [ -d /home/${FLUX_USER} ]; then
     _home_uid=$(stat -c %u /home 2>/dev/null || true)
     _home_gid=$(stat -c %g /home 2>/dev/null || true)
     if [ -n "$_home_uid" ]; then
-        chown -R "$_home_uid:$_home_gid" /home/flux 2>/dev/null || true
+        chown -R "$_home_uid:$_home_gid" /home/${FLUX_USER} 2>/dev/null || true
     fi
-    chown -R flux:flux /home/flux 2>/dev/null || true
-    chmod 755 /home/flux 2>/dev/null || true
-    mkdir -p /home/flux/.config /home/flux/.cache /home/flux/.local/share
-    chmod -R u+rwX /home/flux/.config /home/flux/.cache /home/flux/.local 2>/dev/null || true
+    chown -R ${FLUX_USER}:$(id -gn "${FLUX_USER}") /home/${FLUX_USER} 2>/dev/null || true
+    chmod 755 /home/${FLUX_USER} 2>/dev/null || true
+    mkdir -p /home/${FLUX_USER}/.config /home/${FLUX_USER}/.cache /home/${FLUX_USER}/.local/share
+    chmod -R u+rwX /home/${FLUX_USER}/.config /home/${FLUX_USER}/.cache /home/${FLUX_USER}/.local 2>/dev/null || true
 fi
 
 unset LC_ALL

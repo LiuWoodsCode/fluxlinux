@@ -1,4 +1,6 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_datascience_debian.sh
 # Installs Data Science & AI/ML Stack (Python, R, Julia, IDEs)
 # Target: Debian 13 (Trixie) ARM64
@@ -28,14 +30,14 @@ if [ "$1" = "uninstall" ]; then
     apt autoremove -y 2>/dev/null || true
 
     # Remove Python venv with all data libs (could be many GB)
-    rm -rf /home/flux/data_env
+    rm -rf /home/${FLUX_USER}/data_env
 
     # Revert .bashrc / .zshrc PATH entries added by this script
-    if [ -f /home/flux/.bashrc ]; then
-        sed -i '/# Data Science Environment/d; /\/data_env\/bin/d' /home/flux/.bashrc 2>/dev/null || true
+    if [ -f /home/${FLUX_USER}/.bashrc ]; then
+        sed -i '/# Data Science Environment/d; /\/data_env\/bin/d' /home/${FLUX_USER}/.bashrc 2>/dev/null || true
     fi
-    if [ -f /home/flux/.zshrc ]; then
-        sed -i '/# Data Science Environment/d; /\/data_env\/bin/d' /home/flux/.zshrc 2>/dev/null || true
+    if [ -f /home/${FLUX_USER}/.zshrc ]; then
+        sed -i '/# Data Science Environment/d; /\/data_env\/bin/d' /home/${FLUX_USER}/.zshrc 2>/dev/null || true
     fi
 
     # Remove Julia
@@ -87,7 +89,7 @@ update_shell_path() {
 }
 
 echo "FluxLinux: Setting up Data Science & AI Environment..."
-TARGET_USER="flux"
+TARGET_USER="${FLUX_USER}"
 TARGET_GROUP="users"
 
 # 1. System Dependencies

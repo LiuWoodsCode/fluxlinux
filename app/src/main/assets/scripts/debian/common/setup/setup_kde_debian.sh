@@ -1,4 +1,6 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_kde_debian.sh
 # Base post-install configuration for KDE Plasma on Debian-based distros (PRoot / Chroot)
 # Mirrors what setup_debian_family.sh does, but installs KDE Plasma instead of XFCE4
@@ -38,8 +40,8 @@ if [ "$1" = "uninstall" ] || [ "$2" = "uninstall" ]; then
     apt autoremove -y 2>/dev/null || true
 
     # Remove KDE-specific marker and config
-    rm -f /home/flux/.fluxlinux/kde_installed
-    rm -rf /home/flux/.vnc  # KDE xstartup; vncserver will be re-created by xfce install if needed
+    rm -f /home/${FLUX_USER}/.fluxlinux/kde_installed
+    rm -rf /home/${FLUX_USER}/.vnc  # KDE xstartup; vncserver will be re-created by xfce install if needed
 
     echo "FluxLinux: KDE Plasma Environment Uninstalled."
     exit 0
@@ -114,28 +116,28 @@ apt install -y --no-install-recommends \
 
 # 3. Create user 'flux'
 echo "[4/7] Creating user flux..."
-if ! id "flux" &>/dev/null; then
-    useradd -m -s /bin/bash flux || handle_error "Create user flux"
-    echo "flux:flux" | chpasswd
-    usermod -aG sudo flux
+if ! id "${FLUX_USER}" &>/dev/null; then
+    useradd -m -s /bin/bash ${FLUX_USER} || handle_error "Create user ${FLUX_USER}"
+    echo "${FLUX_USER}:flux" | chpasswd
+    usermod -aG sudo ${FLUX_USER}
 fi
 
 # 4. Configure Sudo NOPASSWD
 echo "[5/7] Configuring sudo..."
-echo "flux ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/flux || handle_error "Configure sudo"
+echo "${FLUX_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${FLUX_USER} || handle_error "Configure sudo"
 
 # 5. Configure VNC for KDE (xstartup)
 echo "[6/7] Setting up KDE session launcher..."
-mkdir -p /home/flux/.vnc
-cat > /home/flux/.vnc/xstartup << 'VNCEOF'
+mkdir -p /home/${FLUX_USER}/.vnc
+cat > /home/${FLUX_USER}/.vnc/xstartup << 'VNCEOF'
 #!/bin/bash
 export PULSE_SERVER=127.0.0.1
 export DBUS_SESSION_BUS_ADDRESS=$(dbus-launch --print-address)
 xrdb $HOME/.Xresources 2>/dev/null
 exec startplasma-x11
 VNCEOF
-chmod +x /home/flux/.vnc/xstartup
-chown -R flux:flux /home/flux/.vnc
+chmod +x /home/${FLUX_USER}/.vnc/xstartup
+chown -R ${FLUX_USER}:$(id -gn "${FLUX_USER}") /home/${FLUX_USER}/.vnc
 
 # Compositing + effects off system-wide by default (XFCE parity; GPU accel path).
 # Per-user config is kept in sync at session start (flux_kde_env.sh).
@@ -158,9 +160,9 @@ systemctl disable sddm 2>/dev/null || true
 
 # 7. Mark as KDE-capable environment
 echo "[7/7] Marking installation complete..."
-mkdir -p /home/flux/.fluxlinux
-touch /home/flux/.fluxlinux/kde_installed
-chown -R flux:flux /home/flux/.fluxlinux
+mkdir -p /home/${FLUX_USER}/.fluxlinux
+touch /home/${FLUX_USER}/.fluxlinux/kde_installed
+chown -R ${FLUX_USER}:$(id -gn "${FLUX_USER}") /home/${FLUX_USER}/.fluxlinux
 
 echo ""
 echo "✅ FluxLinux: KDE Plasma base setup for ${DISTRO_NAME} complete!"

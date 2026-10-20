@@ -44,10 +44,11 @@ import com.ivarna.fluxlinux.core.install.DistroInstallProfile
 import com.ivarna.fluxlinux.core.install.OnboardingInstallRunner
 import com.ivarna.fluxlinux.ui.components.AppScaffold
 import com.ivarna.fluxlinux.ui.install.InstallProgressPanel
-import com.ivarna.fluxlinux.ui.install.InstallThemePickRow
+import com.ivarna.fluxlinux.ui.install.GuestUsernameField
+import com.ivarna.fluxlinux.core.utils.GuestUser
 
 /**
- * Thin install wizard: XFCE + customization only (no feature modules).
+ * Thin install wizard: base XFCE, wallpaper, and hardware support.
  * Uses [OnboardingInstallRunner] for both proot and chroot.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +60,7 @@ fun InstallConfigScreen(
 ) {
     val context = LocalContext.current
     val appCtx = context.applicationContext
-    var selectedTheme by remember { mutableStateOf("dark") }
+    var username by remember(distro.id) { mutableStateOf("") }
     var phase by remember { mutableStateOf(InstallPhase.OPTIONS) }
     var percent by remember { mutableIntStateOf(0) }
     var phaseLabel by remember { mutableStateOf("") }
@@ -79,7 +80,7 @@ fun InstallConfigScreen(
         detail = ""
         logText = ""
         phase = InstallPhase.RUNNING
-        runner.start(distro.id, selectedTheme) { progress ->
+        runner.start(distro.id, username) { progress ->
             percent = progress.overallPercent
             phaseLabel = progress.phaseLabel
             detail = progress.detail
@@ -138,6 +139,7 @@ fun InstallConfigScreen(
                 ) {
                     Button(
                         onClick = { startInstall() },
+                        enabled = GuestUser.validationError(username) == null,
                         modifier = Modifier.fillMaxWidth().height(56.dp)) {
                         val cta = when {
                             distro.id.contains("chroot") -> "Install base desktop (Root)"
@@ -163,37 +165,22 @@ fun InstallConfigScreen(
                 val profile = DistroInstallProfile.forId(distro.id)
                 val rootfsLine = when {
                     distro.id.startsWith("alpine") ->
-                        "Installs Alpine 3.24 minirootfs, XFCE4 (apk), and Flux customization. "
+                        "Installs Alpine 3.24 minirootfs and XFCE4 (apk). "
                     distro.id.startsWith("fedora") ->
-                        "Installs Fedora 44 rootfs, XFCE4 (dnf), Mesa, and Flux customization. "
+                        "Installs Fedora 44 rootfs, XFCE4 (dnf), and Mesa. "
                     distro.id.startsWith("void") ->
-                        "Installs Void Linux rootfs, XFCE4 (xbps), Mesa, and Flux customization. "
+                        "Installs Void Linux rootfs, XFCE4 (xbps), and Mesa. "
                     distro.id.startsWith("opensuse") ->
-                        "Installs openSUSE Tumbleweed rootfs, XFCE4 (zypper), Mesa, and Flux customization. "
+                        "Installs openSUSE Tumbleweed rootfs, XFCE4 (zypper), and Mesa. "
                     else ->
-                        "Installs ${profile?.displayName ?: distro.name} rootfs, XFCE4, and Flux customization. "
+                        "Installs ${profile?.displayName ?: distro.name} rootfs and XFCE4. "
                 }
                 Text(
                     rootfsLine +
-                        "App modules can be added later from Distro Settings.",
+                        "Start with a base desktop and the Kasane Teto wallpaper. " +
+                        "Install apps and customize the desktop yourself, or add optional components from Distro Settings.",
                     style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    "Appearance theme",
-                    style = MaterialTheme.typography.titleSmall)
-                InstallThemePickRow(
-                    id = "dark",
-                    title = "Dark",
-                    desc = "Sleek default",
-                    selected = selectedTheme == "dark",
-                    onSelect = { selectedTheme = "dark" }
-                )
-                InstallThemePickRow(
-                    id = "light",
-                    title = "Light",
-                    desc = "Bright desktop",
-                    selected = selectedTheme == "light",
-                    onSelect = { selectedTheme = "light" }
-                )
+                GuestUsernameField(username, onUsernameChange = { username = it })
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -221,13 +208,8 @@ fun InstallConfigScreen(
                                     "• ${profile?.displayName ?: distro.name} rootfs"
                             })
                         Text("• XFCE4 desktop")
-                        if (distro.id.startsWith("fedora") || distro.id.startsWith("void") ||
-                            distro.id.startsWith("opensuse")
-                        ) {
-                            Text(
-                                "• Mesa / VirGL hardware acceleration")
-                        }
-                        Text("• Flux theme / wallpapers / fonts")
+                        Text("• GPU acceleration, X11 display, and audio support")
+                        Text("• Kasane Teto wallpaper (fill)")
                         if (distro.id.contains("chroot")) {
                             Text("• Requires root (KernelSU / Magisk)")
                         }

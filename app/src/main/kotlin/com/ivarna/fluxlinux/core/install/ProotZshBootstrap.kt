@@ -25,7 +25,8 @@ object ProotZshBootstrap {
     private const val THEME_URL =
         "https://raw.githubusercontent.com/zakaziko99/agnosterzak-ohmyzsh-theme/master/agnosterzak.zsh-theme"
 
-    fun omzDir(rootfs: File): File = File(rootfs, "home/flux/.oh-my-zsh")
+    fun omzDir(rootfs: File): File = File(rootfs,
+        "home/${com.ivarna.fluxlinux.core.utils.GuestUser.inRootfs(rootfs)}/.oh-my-zsh")
 
     fun isOmzInstalled(rootfs: File): Boolean =
         File(omzDir(rootfs), "oh-my-zsh.sh").isFile

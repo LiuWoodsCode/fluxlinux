@@ -1,10 +1,12 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_customization_kde_debian.sh
 # Applies "FluxLinux" branding and customization to Debian KDE Plasma Desktop
 # Mirrors setup_customization_debian.sh structure exactly, adapted for KDE
 # Works for both Chroot and Proot environments (run as root, switches to user 'flux')
 
-CUSTOM_USER="flux"
+CUSTOM_USER="${FLUX_USER}"
 CUSTOM_GROUP="users"
 USER_HOME="/home/$CUSTOM_USER"
 THEME_DIR="/usr/share/themes"
@@ -514,6 +516,7 @@ su -s /bin/bash - "$CUSTOM_USER" -c "
     kwin_x11 --replace > /dev/null 2>&1 &
 " 2>/dev/null || true
 
+rm -f /etc/fluxlinux/base-desktop
 echo "FluxLinux: KDE Customization Complete!"
 echo "Log saved at: $LOG_FILE"
 echo "------------------------------------------------"

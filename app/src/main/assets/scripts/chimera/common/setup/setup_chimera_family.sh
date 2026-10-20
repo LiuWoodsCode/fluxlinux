@@ -54,11 +54,11 @@ apk update || {
 _flux_log "Installing base packages (bash/sudo/shadow BEFORE user)..."
 # Chimera pkg names: no sudo (opendoas), tar=gtar, wget=wget2, font-dejavu=fonts-dejavu.
 if ! apk add bash shadow opendoas ca-certificates curl wget2 unzip gtar xz \
-        git zsh python \
+        git python \
         dbus fonts-dejavu adwaita-icon-theme; then
     _flux_log "base pkg names differ — retrying via cmd: virtual providers"
     apk add cmd:bash cmd:useradd cmd:doas ca-certificates cmd:curl \
-        cmd:wget2 cmd:unzip cmd:gtar cmd:xz cmd:git cmd:zsh cmd:python \
+        cmd:wget2 cmd:unzip cmd:gtar cmd:xz cmd:git cmd:python \
         cmd:dbus-run-session \
         fonts-dejavu || {
             echo "FluxLinux: base package install failed"

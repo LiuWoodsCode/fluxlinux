@@ -6,7 +6,7 @@
 
 # Global Variables
 DEBIANPATH="/data/local/tmp/chrootDebian13"
-USERNAME="flux"
+USERNAME="${FLUX_USER:-flux}"
 
 # Same pinned rootfs as proot path (app assets → deploy to $HOME)
 PKG="${TERMUX_APP__PACKAGE_NAME:-com.ivarna.fluxlinux}"
@@ -304,7 +304,7 @@ GUI=/data/local/tmp/start_debian13_gui.sh
 HELPER=/data/local/tmp/fluxlinux_chroot.sh
 DEBIANPATH="\${DEBIANPATH:-/data/local/tmp/chrootDebian13}"
 TARGET_PREFIX="\${TARGET_PREFIX:-$APP_PREFIX}"
-USERNAME="\${USERNAME:-flux}"
+USERNAME="\${USERNAME:-$USERNAME}"
 export FLUX_PACKAGE="$PKG"
 
 if [ -f "\$GUI" ]; then
@@ -416,7 +416,7 @@ EOF
 HELPER=/data/local/tmp/fluxlinux_chroot.sh
 [ -f "$HELPER" ] || { echo "fluxlinux_chroot.sh missing" >&2; exit 127; }
 echo "Entering Debian 13 Chroot (CLI)..."
-exec sh "$HELPER" login --user flux --shell zsh
+exec sh "$HELPER" login --shell bash
 EOF
     chmod 755 "$CLI_SCRIPT"
     success "CLI Launcher created: $CLI_SCRIPT"

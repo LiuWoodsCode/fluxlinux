@@ -4,7 +4,7 @@
 # Family/XFCE install is owned by onboarding family phase (setup_alpine_family.sh).
 
 ALPINEPATH="${FLUX_CHROOT:-/data/local/tmp/chrootAlpine}"
-USERNAME="flux"
+USERNAME="${FLUX_USER:-flux}"
 
 PKG="${TERMUX_APP__PACKAGE_NAME:-com.ivarna.fluxlinux}"
 APP_HOME="${TERMUX__HOME:-/data/data/${PKG}/files/home}"
@@ -239,7 +239,7 @@ HELPER=/data/local/tmp/fluxlinux_chroot.sh
 [ -f "$HELPER" ] || { echo "fluxlinux_chroot.sh missing" >&2; exit 127; }
 export FLUX_CHROOT="${FLUX_CHROOT:-/data/local/tmp/chrootAlpine}"
 echo "Entering Alpine Chroot (CLI)..."
-exec sh "$HELPER" login --user flux --shell zsh
+exec sh "$HELPER" login --shell bash
 EOF
     chmod 755 "$CLI_SCRIPT"
 
@@ -311,7 +311,7 @@ fi
     # Minirootfs always has bin/sh + sbin/apk — those alone must NOT skip configure.
     if [ -f "$ALPINEPATH/.flux_configured" ] && \
        { [ -e "$ALPINEPATH/bin/bash" ] || [ -e "$ALPINEPATH/usr/bin/bash" ]; } && \
-       grep -q '^flux:' "$ALPINEPATH/etc/passwd" 2>/dev/null; then
+       grep -q "^$USERNAME:" "$ALPINEPATH/etc/passwd" 2>/dev/null; then
         success "Alpine Chroot already installed."
         progress "VERIFY: chroot present at $ALPINEPATH"
         am start -a android.intent.action.VIEW \

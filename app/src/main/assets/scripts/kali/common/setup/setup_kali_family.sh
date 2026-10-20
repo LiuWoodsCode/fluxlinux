@@ -54,7 +54,7 @@ fi
 _flux_log "Installing base packages..."
 apt-get install -y --no-install-recommends \
     bash sudo passwd adduser ca-certificates curl wget unzip tar xz-utils \
-    git zsh python3 locales \
+    git python3 locales \
     dbus dbus-x11 || {
         echo "FluxLinux: base package install failed"
         exit 1

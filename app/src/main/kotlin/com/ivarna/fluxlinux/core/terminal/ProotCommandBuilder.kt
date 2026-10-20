@@ -3,6 +3,7 @@ package com.ivarna.fluxlinux.core.terminal
 import android.content.Context
 import android.util.Log
 import com.ivarna.fluxlinux.core.utils.TerminalPreferences
+import com.ivarna.fluxlinux.core.utils.GuestUser
 import java.io.File
 import java.io.FileInputStream
 import java.nio.file.Files
@@ -28,8 +29,8 @@ object ProotCommandBuilder {
 
     /** `KEY=value` list behind [guestLoginEnv]; [term] is the TERM value as written. */
     fun guestEnvVars(user: String, term: String): List<String> {
-        val u = if (user == "root") "root" else "flux"
-        val home = if (u == "root") "/root" else "/home/flux"
+        val u = GuestUser.requireLogin(user)
+        val home = GuestUser.home(u)
         // Do not force LANG/LC_ALL here: missing en_US.UTF-8 prints
         // "cannot change locale" from /bin/sh before profile.d can pick.
         // Guest flux-locale.sh / .zshrc select a locale that exists.

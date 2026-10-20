@@ -5,17 +5,16 @@ import android.util.Base64
 import com.ivarna.fluxlinux.core.data.Distro
 import com.ivarna.fluxlinux.core.data.DistroRepository
 import com.ivarna.fluxlinux.core.data.ScriptManager
+import com.ivarna.fluxlinux.core.utils.GuestUser
 
 /**
- * Minimal base desktop install: rootfs + family (XFCE) + customization.
+ * Minimal base desktop install: rootfs + family (XFCE) + wallpaper + GPU support.
  * Distro-specific paths come from [DistroInstallProfile].
  */
 object BaseDesktopInstallPlan {
 
     /** @deprecated Prefer [DistroInstallProfile.familyScript] for the active distro. */
     const val FAMILY_SCRIPT = "debian/common/setup/setup_debian_family.sh"
-    /** @deprecated Prefer [DistroInstallProfile.customizationScript]. */
-    const val CUSTOMIZATION_SCRIPT = "debian/common/setup/setup_customization_debian.sh"
 
     data class Phase(val id: String, val label: String, val weight: Int)
 
@@ -34,22 +33,23 @@ object BaseDesktopInstallPlan {
                 Phase("HOST", "Preparing host (may download bootstrap from GitHub)…", 15),
                 Phase("DL", "Downloading $displayName rootfs…", 10),
                 Phase("ROOTFS", "Installing $displayName chroot rootfs…", 30),
-                Phase("XFCE", "Installing XFCE desktop…", 25),
-                Phase("CUSTOM", "Applying Flux customization…", 15),
+                Phase("XFCE", "Installing XFCE desktop…", 30),
+                Phase("FINISH", "Setting wallpaper and hardware acceleration…", 10),
             )
         } else {
             listOf(
                 Phase("HOST", "Preparing host (may download bootstrap from GitHub)…", 20),
                 Phase("DL", "Downloading $displayName rootfs…", 15),
-                Phase("ROOTFS", "Installing $displayName rootfs + XFCE…", 35),
-                Phase("CUSTOM", "Applying Flux customization…", 30),
+                Phase("ROOTFS", "Installing $displayName rootfs + XFCE…", 55),
+                Phase("FINISH", "Setting wallpaper and hardware acceleration…", 10),
             )
         }
 
     /** Back-compat overload used by existing tests. */
     fun phasesFor(method: String): List<Phase> = phasesFor(method, "Debian")
 
-    fun familySetupPayload(ctx: Context, theme: String, distroId: String = "debian"): String {
+    fun familySetupPayload(ctx: Context, distroId: String = "debian", username: String = GuestUser.get(ctx, distroId)): String {
+        GuestUser.requireValid(username)
         val profile = DistroInstallProfile.forId(distroId)
             ?: DistroInstallProfile.require("debian")
         val sm = ScriptManager(ctx)
@@ -58,7 +58,12 @@ object BaseDesktopInstallPlan {
             sm.getScriptContent("common/setup/flux_guest_common.sh")
         }.getOrDefault("")
         return buildString {
-            append("export FLUX_THEME='").append(theme).append("'\n")
+            append("export FLUX_USER='").append(username).append("'\n")
+            append("mkdir -p /etc/fluxlinux /etc/profile.d\n")
+            append("printf '%s\\n' \"\$FLUX_USER\" > /etc/fluxlinux/username\n")
+            append("cat > /etc/profile.d/flux-user.sh <<'FLUX_USER_EOF'\n")
+            append(sm.getScriptContent("common/setup/flux_guest_user.sh")).append("\nFLUX_USER_EOF\n")
+            append(". /etc/profile.d/flux-user.sh\n")
             append("export FLUX_DESKTOP_ENV='xfce'\n")
             append("export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\n")
             if (common.isNotBlank()) {
@@ -68,24 +73,11 @@ object BaseDesktopInstallPlan {
         }
     }
 
-    fun familySetupB64(ctx: Context, theme: String, distroId: String = "debian"): String =
+    fun familySetupB64(ctx: Context, distroId: String = "debian", username: String = GuestUser.get(ctx, distroId)): String =
         Base64.encodeToString(
-            familySetupPayload(ctx, theme, distroId).toByteArray(Charsets.UTF_8),
+            familySetupPayload(ctx, distroId, username).toByteArray(Charsets.UTF_8),
             Base64.NO_WRAP
         )
-
-    fun customizationPayload(ctx: Context, theme: String, distroId: String = "debian"): String {
-        val profile = DistroInstallProfile.forId(distroId)
-            ?: DistroInstallProfile.require("debian")
-        val body = ScriptManager(ctx).getScriptContent(profile.customizationScript)
-        return buildString {
-            append("export FLUX_THEME='").append(theme).append("'\n")
-            // Guest installs pokemon (60s budget). Host never ships it.
-            append("export FLUX_SKIP_POKEMON='0'\n")
-            append("export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n\n")
-            append(body)
-        }
-    }
 
     /**
      * Guest hw-accel payload: [flux_gpu_common.sh] + installer.

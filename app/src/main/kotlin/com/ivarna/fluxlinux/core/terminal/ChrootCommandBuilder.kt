@@ -3,6 +3,7 @@ package com.ivarna.fluxlinux.core.terminal
 import android.content.Context
 import com.ivarna.fluxlinux.core.root.ChrootPaths
 import com.ivarna.fluxlinux.core.root.RootShell
+import com.ivarna.fluxlinux.core.utils.GuestUser
 
 /** Builds shell arguments and environment map for chroot Debian sessions (SSOT helper).
  *  Ported from termux-lib `ChrootCommandBuilder` (fluxlinux_chroot.sh v2.2).
@@ -61,7 +62,7 @@ object ChrootCommandBuilder {
         loginShellFlux: String = "zsh",
         loginShellRoot: String = "bash"
     ): String {
-        val u = if (user == "root") "root" else "flux"
+        val u = GuestUser.requireLogin(user)
         val workdir = GuestLoginShell.parseInteractiveWorkdir(shellCmd)
         val isInteractive = GuestLoginShell.isInteractiveLogin(shellCmd)
 
@@ -74,7 +75,7 @@ object ChrootCommandBuilder {
             }
             isInteractive -> {
                 val wd = workdir?.let { " --workdir ${shellSingleQuote(it)}" } ?: ""
-                "exec sh $helper login --user flux --shell $loginShellFlux$wd"
+                "exec sh $helper login --user $u --shell $loginShellFlux$wd"
             }
             isSimpleGuestCmd(shellCmd) -> {
                 val esc = shellCmd.replace("'", "'\\''")
@@ -94,11 +95,11 @@ object ChrootCommandBuilder {
         user: String = "flux",
         chrootPath: String = ChrootPaths.CHROOT_PATH
     ): HashMap<String, String> {
-        val u = if (user == "root") "root" else "flux"
+        val u = GuestUser.requireLogin(user)
         val envMap = HashMap(System.getenv())
         envMap["PATH"] = "/system/bin:/system/xbin:/sbin:" + (envMap["PATH"] ?: "")
         envMap["TERM"] = "xterm-256color"
-        envMap["HOME"] = if (u == "root") "/root" else "/home/flux"
+        envMap["HOME"] = GuestUser.home(u)
         envMap["LANG"] = "C"
         envMap.remove("LC_ALL")
         envMap["XDG_RUNTIME_DIR"] = "/tmp"

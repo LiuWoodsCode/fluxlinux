@@ -98,6 +98,8 @@ import com.ivarna.fluxlinux.core.data.Distro
 import com.ivarna.fluxlinux.core.data.DistroRepository
 import com.ivarna.fluxlinux.core.install.HostBootstrap
 import com.ivarna.fluxlinux.core.install.OnboardingInstallRunner
+import com.ivarna.fluxlinux.core.utils.GuestUser
+import com.ivarna.fluxlinux.ui.install.GuestUsernameField
 import com.ivarna.fluxlinux.core.root.RootShell
 import com.ivarna.fluxlinux.core.system.SharedStorageAccess
 import com.ivarna.fluxlinux.core.terminal.TerminalLauncher
@@ -114,7 +116,7 @@ private enum class OnboardStep { Welcome, Consent, HostSetup, DistroPick, Option
 /**
  * Redesigned full first-run onboarding:
  * Welcome → Disclosure/Consent → Host Setup → Distro Selection → Options → Progress → Complete.
- * Installs rootfs + XFCE + customization with Material 3 components and responsive layouts.
+ * Installs rootfs + base XFCE + wallpaper and hardware support.
  */
 @Composable
 fun OnboardingFlowScreen(
@@ -125,7 +127,7 @@ fun OnboardingFlowScreen(
     val context = LocalContext.current
     var step by remember { mutableStateOf(OnboardStep.Welcome) }
     var selectedDistroId by remember { mutableStateOf("debian") }
-    var theme by remember { mutableStateOf("dark") }
+    var username by remember { mutableStateOf("") }
 
     var percent by remember { mutableIntStateOf(0) }
     var phaseLabel by remember { mutableStateOf("") }
@@ -148,7 +150,7 @@ fun OnboardingFlowScreen(
         logText = ""
         failed = false
         errorMessage = null
-        runner.start(selectedDistroId, theme) { p ->
+        runner.start(selectedDistroId, username) { p ->
             percent = p.overallPercent
             phaseLabel = p.phaseLabel
             detail = p.detail
@@ -190,8 +192,8 @@ fun OnboardingFlowScreen(
             )
             OnboardStep.Options -> OptionsPage(
                 distroId = selectedDistroId,
-                theme = theme,
-                onTheme = { theme = it },
+                username = username,
+                onUsernameChange = { username = it },
                 onBack = { step = OnboardStep.DistroPick },
                 onInstall = {
                     if (SharedStorageAccess.declared(context) && !SharedStorageAccess.granted()) {
@@ -298,17 +300,17 @@ private fun WelcomePage(onNext: () -> Unit) {
                 title = "PRoot & Chroot",
                 description = "No root required with PRoot mode, or run with full native speed via Chroot on rooted devices.")
 
-            // Feature 2: Desktop & Themes
+            // Feature 2: Base desktop
             ModernFeatureCard(
                 icon = Icons.Filled.DesktopWindows,
                 title = "XFCE4 Desktop",
-                description = "Pre-configured desktop experience with Flux glass themes, icons, wallpapers, and fonts.")
+                description = "A base desktop with the Kasane Teto wallpaper, ready for your own apps and customization.")
 
             // Feature 3: Integrated Terminal & X11
             ModernFeatureCard(
                 icon = Icons.Filled.Terminal,
                 title = "Embedded Terminal & X11",
-                description = "Built-in hardware accelerated X11 display and multi-tab terminal with Oh My Zsh integration.")
+                description = "Built-in hardware accelerated X11 display, audio support, and a multi-tab terminal.")
 
             Spacer(Modifier.height(4.dp))
 
@@ -884,8 +886,8 @@ private fun ModernSelectableDistroCard(
 @Composable
 private fun OptionsPage(
     distroId: String,
-    theme: String,
-    onTheme: (String) -> Unit,
+    username: String,
+    onUsernameChange: (String) -> Unit,
     onBack: () -> Unit,
     onInstall: () -> Unit
 ) {
@@ -935,37 +937,15 @@ private fun OptionsPage(
                         Text(
                             text = distro?.name ?: distroId)
                         Text(
-                            text = "Base XFCE4 desktop with Flux customizations",
+                            text = "Base XFCE4 desktop, ready to customize",
             style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
 
-            // Appearance Theme Selection
             Text(
-                text = "Appearance Theme")
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                ThemeOptionCard(
-                    title = "Dark Theme",
-                    desc = "Sleek default",
-                    isDark = true,
-                    selected = theme == "dark",
-                    onSelect = { onTheme("dark") },
-                    modifier = Modifier.weight(1f)
-                )
-                ThemeOptionCard(
-                    title = "Light Theme",
-                    desc = "Bright workspace",
-                    isDark = false,
-                    selected = theme == "light",
-                    onSelect = { onTheme("light") },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                text = "Install apps and rice the desktop your way. Flux customization is available later from Distro Settings.")
+            GuestUsernameField(username, onUsernameChange)
 
             // Package Manifest Card
             Box(
@@ -998,11 +978,10 @@ private fun OptionsPage(
                             else -> "Debian 13 rootfs"
                         },
                         "XFCE4 lightweight desktop environment",
-                        if (distroId.startsWith("fedora") || distroId.startsWith("void") || distroId.startsWith("opensuse"))
-                            "Mesa / VirGL 3D hardware acceleration" else null,
-                        "Flux themes, wallpapers, and Nerd fonts",
-                        "Embedded X11 display server + Zsh terminal"
-                    ).filterNotNull()
+                        "GPU acceleration and audio support",
+                        "Kasane Teto wallpaper (fill)",
+                        "Embedded X11 display server and terminal"
+                    )
 
                     items.forEach { item ->
                         Row(
@@ -1061,71 +1040,11 @@ private fun OptionsPage(
 
             FluxPrimaryButton(
                 text = "Install Now",
-                enabled = downloadConsent,
+                enabled = downloadConsent && GuestUser.validationError(username) == null,
                 icon = Icons.Filled.Download,
                 onClick = onInstall,
                 modifier = Modifier.weight(1.3f)
             )
-        }
-    }
-}
-
-@Composable
-private fun ThemeOptionCard(
-    title: String,
-    desc: String,
-    isDark: Boolean,
-    selected: Boolean,
-    onSelect: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = MaterialTheme.colorScheme
-    val borderColor = if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
-
-    Box(
-        modifier = modifier
-            .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
-            .background(if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else colors.surface)
-            .border(if (selected) 1.5.dp else 1.dp, borderColor, androidx.compose.material3.MaterialTheme.shapes.medium)
-            .clickable(onClick = onSelect)
-            .padding(12.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Swatch preview circle
-                Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .clip(CircleShape)
-                        .background(if (isDark) androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant else androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
-                        .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (selected) {
-                        Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp))
-                    }
-                }
-
-                RadioButton(
-                    selected = selected,
-                    onClick = onSelect,
-                    modifier = Modifier.size(20.dp))
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            Text(
-                text = title)
-            Text(
-                text = desc,
-            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
     }
 }

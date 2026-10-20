@@ -340,7 +340,8 @@ object ProotXfceAssetInstaller {
         sel: Selection,
         onLog: (String) -> Unit
     ) {
-        val destDir = File(rootfs, "home/flux/Pictures/Wallpapers").also { it.mkdirs() }
+        val username = com.ivarna.fluxlinux.core.utils.GuestUser.inRootfs(rootfs)
+        val destDir = File(rootfs, "home/$username/Pictures/Wallpapers").also { it.mkdirs() }
         val dest = File(destDir, sel.wallpaperFileName)
         if (dest.isFile && dest.length() > 10_000) return
         try {

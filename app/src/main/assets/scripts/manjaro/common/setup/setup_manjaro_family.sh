@@ -185,13 +185,12 @@ fi
 
 _flux_log "Installing base + XFCE packages (targeted — no xfce4 group first)..."
 if ! pacman -S --noconfirm --needed \
-    shadow sudo git zsh python sed gzip \
+    shadow sudo git python sed gzip \
     dbus-broker-units \
     xfce4-session xfce4-panel xfce4-settings xfce4-terminal \
     xfdesktop xfwm4 thunar \
     ttf-dejavu adwaita-icon-theme \
     mesa mesa-utils \
-    fastfetch \
     dbus; then
     echo "FluxLinux: XFCE install failed"
     exit 1

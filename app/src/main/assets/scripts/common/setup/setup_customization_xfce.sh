@@ -1,10 +1,12 @@
 #!/bin/sh
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_customization_xfce.sh
 # FluxLinux XFCE branding for Fedora / Void / openSUSE / Deepin / Chimera / Manjaro.
 # Same theme/icon/font/xfconf path as Alpine; package manager auto-detected.
 
-CUSTOM_USER="flux"
-CUSTOM_GROUP="flux"
+CUSTOM_USER="${FLUX_USER}"
+CUSTOM_GROUP="${FLUX_USER}"
 USER_HOME="/home/$CUSTOM_USER"
 THEME_DIR="/usr/share/themes"
 ICON_DIR="/usr/share/icons"
@@ -42,8 +44,8 @@ _flux_chown_r() { chown -R "$@" 2>/dev/null || true; }
 # Fedora 44 + proot: sudo PAM account fails → "a password is required".
 if command -v sudo >/dev/null 2>&1; then
     mkdir -p /etc/sudoers.d
-    echo "flux ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/flux
-    chmod 0440 /etc/sudoers.d/flux 2>/dev/null || true
+    echo "${FLUX_USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${FLUX_USER}
+    chmod 0440 /etc/sudoers.d/${FLUX_USER} 2>/dev/null || true
     chmod 0755 /etc/sudoers.d 2>/dev/null || true
     if [ -f /etc/sudoers ]; then
         grep -qE '@includedir[[:space:]]+/etc/sudoers\.d' /etc/sudoers 2>/dev/null \
@@ -1029,5 +1031,6 @@ if [ -n "$_ref_u" ]; then
     done
 fi
 
+rm -f /etc/fluxlinux/base-desktop
 echo "FluxLinux: XFCE4 Customization complete!"
 exit 0

@@ -1,9 +1,11 @@
 #!/bin/bash
+[ ! -r /etc/profile.d/flux-user.sh ] || . /etc/profile.d/flux-user.sh
+FLUX_USER="${FLUX_USER:-flux}"
 # setup_customization_debian.sh
 # Applies "FluxLinux" branding and customization to Debian XFCE4 Desktop
 # Works for both Chroot and Proot environments (run as root, switches to user 'flux')
 
-CUSTOM_USER="flux"
+CUSTOM_USER="${FLUX_USER}"
 CUSTOM_GROUP="users"
 USER_HOME="/home/$CUSTOM_USER"
 ASSETS_DIR="$(dirname "$0")/../../../assets"
@@ -1086,6 +1088,7 @@ fi
 su -s /bin/bash - "$CUSTOM_USER" -c "DISPLAY=:0 nohup xfsettingsd > /dev/null 2>&1 &" 2>/dev/null
 sleep 1
 
+rm -f /etc/fluxlinux/base-desktop
 echo "FluxLinux: Customization Complete!"
 echo "------------------------------------------------"
 # Interactive pause only in a real terminal — hangs forever under onboarding
