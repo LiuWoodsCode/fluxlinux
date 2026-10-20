@@ -41,14 +41,10 @@ import com.ivarna.fluxlinux.core.gpu.PanvkInstaller
 import com.ivarna.fluxlinux.core.terminal.GpuAccelDetector
 import com.ivarna.fluxlinux.core.utils.InstallationQueueManager
 import com.ivarna.fluxlinux.core.utils.StateManager
-import com.ivarna.fluxlinux.ui.components.GlassScaffold
+import com.ivarna.fluxlinux.ui.components.AppScaffold
 import com.ivarna.fluxlinux.ui.theme.*
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeChild
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DistroSettingsScreen(
     distro: Distro,
@@ -64,7 +60,6 @@ fun DistroSettingsScreen(
     onLaunchKde: (() -> Unit)? = null,
     onStopKde: (() -> Unit)? = null,
     onLaunchCli: (() -> Unit)? = null,
-    hazeState: HazeState
 ) {
     val context = LocalContext.current
     val installState by InstallationQueueManager.installState.collectAsState()
@@ -75,7 +70,7 @@ fun DistroSettingsScreen(
     var showThemeDialog by remember { mutableStateOf(false) }
     var showGpuDialog by remember { mutableStateOf(false) }
     var activeComponent by remember { mutableStateOf<DistroComponent?>(null) }
-    
+
     // Selections
     var selectedTheme by remember { mutableStateOf("dark") }
     var selectedGpu by remember { mutableStateOf("auto") }
@@ -87,27 +82,21 @@ fun DistroSettingsScreen(
         }
     }
 
-    GlassScaffold(
-        hazeState = hazeState,
+    AppScaffold(
+
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Manage ${distro.name}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = MaterialTheme.colorScheme.onBackground)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                ),
-                modifier = Modifier.hazeChild(state = hazeState, shape = androidx.compose.ui.graphics.RectangleShape, style = HazeMaterials.thin())
-            )
+                modifier = Modifier)
         },
         content = {
             LazyColumn(
@@ -117,30 +106,20 @@ fun DistroSettingsScreen(
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 contentPadding = PaddingValues(top = 24.dp, bottom = 48.dp)
             ) {
-                
-                // Header (Glass Card)
+
+                // Distro details
                 item {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp))
+                            .clip(androidx.compose.material3.MaterialTheme.shapes.large)
                             .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        MaterialTheme.colorScheme.surface.copy(alpha = 0.4f),
-                                        MaterialTheme.colorScheme.surface.copy(alpha = 0.2f)
-                                    )
-                                )
+                                androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                             )
                             .border(
-                                1.dp, 
-                                Brush.verticalGradient(
-                                    listOf(
-                                        Color.White.copy(alpha = 0.2f),
-                                        Color.Transparent
-                                    )
-                                ), 
-                                RoundedCornerShape(24.dp)
+                                1.dp,
+                                androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
+                                androidx.compose.material3.MaterialTheme.shapes.large
                             )
                             .padding(20.dp)
                     ) {
@@ -150,45 +129,38 @@ fun DistroSettingsScreen(
                             Box(
                                 modifier = Modifier
                                     .size(56.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                                    .background(MaterialTheme.colorScheme.surfaceVariant),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (distro.iconRes != null) {
                                     Icon(
                                         painter = androidx.compose.ui.res.painterResource(id = distro.iconRes),
                                         contentDescription = null,
-                                        tint = Color.Unspecified, 
-                                        modifier = Modifier.size(36.dp)
-                                    )
+                                        modifier = Modifier.size(36.dp))
                                 } else {
-                                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(32.dp))
+                                    Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(32.dp))
                                 }
                             }
-                            
+
                             Spacer(modifier = Modifier.width(16.dp))
-                            
+
                             Column {
                                 Text(
-                                    distro.name, 
-                                    style = MaterialTheme.typography.headlineSmall, 
-                                    fontWeight = FontWeight.Bold, 
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
+                                    distro.name,
+                                    style = MaterialTheme.typography.headlineSmall)
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Box(
                                         modifier = Modifier
                                             .size(8.dp)
                                             .clip(androidx.compose.foundation.shape.CircleShape)
-                                            .background(Color(0xFF4CAF50))
+                                            .background(androidx.compose.material3.MaterialTheme.colorScheme.primary)
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        "Installed & Ready", 
-                                        style = MaterialTheme.typography.bodyMedium, 
-                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                    )
+                                        "Installed & Ready",
+                                        style = MaterialTheme.typography.bodyMedium)
                                 }
                             }
                         }
@@ -200,10 +172,7 @@ fun DistroSettingsScreen(
                 item {
                     Text(
                         text = "Features & Components",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.secondary,
-                        fontWeight = FontWeight.Bold
-                    )
+                        style = MaterialTheme.typography.titleMedium)
                 }
 
 
@@ -220,7 +189,7 @@ fun DistroSettingsScreen(
                     }
                     val details = componentDetailsMap[component.id]
 
-                    ComponentManagementGlassCard(
+                    ComponentManagementCard(
                         component = component,
                         isInstalled = isInstalled,
                         isGlobalInstalling = installState.isInstalling,
@@ -260,62 +229,45 @@ fun DistroSettingsScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Danger Zone",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color(0xFFFF5252),
-                        fontWeight = FontWeight.Bold
-                    )
+                        style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                         // Reinstall Button (Redo Base Install)
                         Button(
                             onClick = onReinstallDistro,
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF2C2C2C).copy(alpha = 0.5f),
-                                contentColor = Color(0xFFFF9E80)
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, Color(0xFFFF9E80).copy(alpha = 0.3f))
-                        ) {
+                            modifier = Modifier.fillMaxWidth().height(56.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text("Re-run Installation Script", fontWeight = FontWeight.SemiBold)
+                                Text("Re-run Installation Script")
                             }
                         }
-                        
+
                         // Uninstall Button
                         Button(
                             onClick = { showUninstallDialog = true },
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0x33FF5252),
-                                contentColor = Color(0xFFFF5252)
-                            ),
-                            shape = RoundedCornerShape(16.dp),
-                            border = BorderStroke(1.dp, Color(0xFFFF5252).copy(alpha = 0.5f))
-                        ) {
+                            modifier = Modifier.fillMaxWidth().height(56.dp)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(12.dp))
-                                Text("Uninstall Distribution", fontWeight = FontWeight.Bold)
+                                Text("Uninstall Distribution")
                             }
                         }
                     }
-                    
+
                     Spacer(modifier = Modifier.height(50.dp))
                 }
             }
         }
     )
-    
+
     // --- DIALOGS ---
 
     // Component Uninstall Dialog (per-component, not whole-distro)
     if (pendingUninstallComponent != null) {
         val comp = pendingUninstallComponent!!
-        GlassDialog(onDismiss = { pendingUninstallComponent = null }) {
+        SettingsDialog(onDismiss = { pendingUninstallComponent = null }) {
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -323,25 +275,18 @@ fun DistroSettingsScreen(
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    tint = Color(0xFFFF5252),
-                    modifier = Modifier.size(48.dp)
-                )
+                    modifier = Modifier.size(48.dp))
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Uninstall ${comp.name}?",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                    style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     "This will remove ${comp.name} (${comp.sizeEstimate}) and all its data. " +
                         "You can re-install it later from this screen.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    modifier = Modifier.fillMaxWidth())
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -349,24 +294,14 @@ fun DistroSettingsScreen(
                 ) {
                     Button(
                         onClick = { pendingUninstallComponent = null },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                        ),
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Cancel") }
+                        modifier = Modifier.weight(1f)) { Text("Cancel") }
                     Button(
                         onClick = {
                             val toUninstall = pendingUninstallComponent
                             pendingUninstallComponent = null
                             if (toUninstall != null) onUninstallComponent(toUninstall)
                         },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = com.ivarna.fluxlinux.ui.theme.FluxDanger,
-                            contentColor = Color.White
-                        ),
-                        modifier = Modifier.weight(1f)
-                    ) { Text("Uninstall") }
+                        modifier = Modifier.weight(1f)) { Text("Uninstall") }
                 }
             }
         }
@@ -374,7 +309,7 @@ fun DistroSettingsScreen(
 
     // Uninstall Dialog
     if (showUninstallDialog) {
-        GlassDialog(onDismiss = { showUninstallDialog = false }) {
+        SettingsDialog(onDismiss = { showUninstallDialog = false }) {
              Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -382,38 +317,29 @@ fun DistroSettingsScreen(
                 Icon(
                     imageVector = Icons.Default.Warning,
                     contentDescription = null,
-                    tint = Color(0xFFFF5252),
-                    modifier = Modifier.size(48.dp)
-                )
+                    modifier = Modifier.size(48.dp))
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = "Uninstall ${distro.name}?",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                
+                    style = MaterialTheme.typography.titleLarge)
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     "This will remove all data and files for ${distro.name}. This action cannot be undone.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center)
 
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Button(
                         onClick = { showUninstallDialog = false },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant, contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
-                        modifier = Modifier.weight(1f)
-                    ) {
+                        modifier = Modifier.weight(1f)) {
                         Text("Cancel")
                     }
-                    
+
                     Button(
                         onClick = {
                             // Embedded uninstall only (plan §4.5): chroot → SSOT
@@ -422,9 +348,7 @@ fun DistroSettingsScreen(
                             onUninstallDistro()
                             showUninstallDialog = false
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = com.ivarna.fluxlinux.ui.theme.FluxDanger, contentColor = Color.White),
-                        modifier = Modifier.weight(1f)
-                    ) {
+                        modifier = Modifier.weight(1f)) {
                         Text("Uninstall")
                     }
                 }
@@ -434,23 +358,21 @@ fun DistroSettingsScreen(
 
     // Theme Configuration Dialog
     if (showThemeDialog && activeComponent != null) {
-        GlassDialog(onDismiss = { showThemeDialog = false }) {
+        SettingsDialog(onDismiss = { showThemeDialog = false }) {
             Column(modifier = Modifier.padding(24.dp)) {
-                Text("Customize Desktop", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                Text("Customize Desktop", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 SettingsThemeOption(name = "Dark Mode (Default)", desc = "Sleek and professional.", id = "dark", selected = selectedTheme == "dark", onSelect = { selectedTheme = "dark" })
                 SettingsThemeOption(name = "Light Mode", desc = "Clean and bright.", id = "light", selected = selectedTheme == "light", onSelect = { selectedTheme = "light" })
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
                         showThemeDialog = false
                         onInstallComponent(activeComponent!!, mapOf("FLUX_THEME" to selectedTheme))
                     },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) {
+                    modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text("Apply Theme")
                 }
             }
@@ -459,16 +381,16 @@ fun DistroSettingsScreen(
 
     // GPU Configuration Dialog
     if (showGpuDialog && activeComponent != null) {
-        GlassDialog(onDismiss = { showGpuDialog = false }) {
+        SettingsDialog(onDismiss = { showGpuDialog = false }) {
             Column(modifier = Modifier.padding(24.dp)) {
-                Text("Hardware Acceleration", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
+                Text("Hardware Acceleration", style = MaterialTheme.typography.titleLarge)
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 SettingsThemeOption(name = "Auto Detect (Recommended)", desc = "Detects Snapdragon (Turnip) or uses VirGL.", id = "auto", selected = selectedGpu == "auto", onSelect = { selectedGpu = "auto" })
                 SettingsThemeOption(name = "VirGL (Universal)", desc = "Compatible with most devices.", id = "virgl", selected = selectedGpu == "virgl", onSelect = { selectedGpu = "virgl" })
                 SettingsThemeOption(name = "Turnip/Zink (Snapdragon)", desc = "High performance for Adreno.", id = "turnip", selected = selectedGpu == "turnip", onSelect = { selectedGpu = "turnip" })
                 SettingsThemeOption(name = "Force Re-Detect", desc = "Ask interactively during install.", id = "ask", selected = selectedGpu == "ask", onSelect = { selectedGpu = "ask" })
-                
+
                 val adreno = remember { GpuAccelDetector.detect().mode == GpuAccelDetector.MODE_TURNIP }
                 val waiting by DriverRelease.waiting.collectAsState()
                 val driverPending = GpuDriverInstaller.pendingDistro(context) != null
@@ -491,8 +413,7 @@ fun DistroSettingsScreen(
                                 upd && inst != null -> "\nUpdate available."
                                 else -> ""
                             },
-                        style = MaterialTheme.typography.bodySmall
-                    )
+                        style = MaterialTheme.typography.bodySmall)
                 } else if (elig is PanvkInstaller.Elig.Skip) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text("GPU driver (PanVK): ${elig.msg}", style = MaterialTheme.typography.bodySmall)
@@ -515,9 +436,7 @@ fun DistroSettingsScreen(
                             )
                         )
                     },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
-                ) {
+                    modifier = Modifier.fillMaxWidth().height(50.dp)) {
                     Text(if ((adreno || panvk) && driverPending) "Retry" else "Apply Configuration")
                 }
             }
@@ -525,40 +444,16 @@ fun DistroSettingsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GlassDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = onDismiss,
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        val cs = MaterialTheme.colorScheme
-        val dark = cs.surface.luminance() < 0.5f
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.9f)
-                .clip(RoundedCornerShape(28.dp))
-                .background(
-                    Brush.linearGradient(
-                        colors = if (dark) listOf(
-                            Color(0xFF1E1E1E).copy(alpha = 0.95f),
-                            Color(0xFF121212).copy(alpha = 0.98f)
-                        ) else listOf(
-                            cs.surface.copy(alpha = 0.98f),
-                            cs.surface.copy(alpha = 0.98f)
-                        )
-                    )
-                )
-                .border(
-                    BorderStroke(1.dp, Brush.verticalGradient(
-                        listOf(
-                            (if (dark) Color.White else cs.onSurface).copy(alpha = 0.15f),
-                            Color.Transparent
-                        )
-                    )),
-                    RoundedCornerShape(28.dp)
-                )
+fun SettingsDialog(onDismiss: () -> Unit, content: @Composable () -> Unit) {
+    AlertDialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = MaterialTheme.shapes.extraLarge,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 6.dp
         ) {
-            CompositionLocalProvider(LocalContentColor provides cs.onSurface) { content() }
+            content()
         }
     }
 }
@@ -570,25 +465,23 @@ fun SettingsThemeOption(name: String, desc: String, id: String, selected: Boolea
             .fillMaxWidth()
             .clickable { onSelect() }
             .padding(vertical = 8.dp)
-            .background(if(selected) MaterialTheme.colorScheme.secondary.copy(alpha=0.16f) else Color.Transparent, RoundedCornerShape(8.dp))
+            .background(if(selected) MaterialTheme.colorScheme.secondaryContainer else Color.Transparent, androidx.compose.material3.MaterialTheme.shapes.small)
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = selected,
-            onClick = onSelect,
-            colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.secondary)
-        )
+            onClick = onSelect)
         Spacer(modifier = Modifier.width(8.dp))
         Column {
-            Text(name, fontWeight = FontWeight.SemiBold, color = if(selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface)
-            Text(desc, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(name)
+            Text(desc, style = MaterialTheme.typography.bodySmall)
         }
     }
 }
 
 @Composable
-fun ComponentManagementGlassCard(
+fun ComponentManagementCard(
     component: DistroComponent,
     isInstalled: Boolean,
     isGlobalInstalling: Boolean = false,
@@ -601,9 +494,9 @@ fun ComponentManagementGlassCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.4f)) // Glass background
-            .border(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f), RoundedCornerShape(20.dp))
+            .clip(androidx.compose.material3.MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surface)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.large)
             .clickable(enabled = !component.comingSoon) { expanded = !expanded }
             .padding(16.dp)
     ) {
@@ -619,57 +512,50 @@ fun ComponentManagementGlassCard(
                             Icon(
                                 imageVector = details.icon,
                                 contentDescription = null,
-                                modifier = Modifier.size(24.dp),
-                                tint = if (component.comingSoon) MaterialTheme.colorScheme.secondary.copy(alpha = 0.4f) else MaterialTheme.colorScheme.secondary
-                            )
+                                modifier = Modifier.size(24.dp))
                             Spacer(modifier = Modifier.width(10.dp))
                         }
-                        
+
                         Text(
                             text = component.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (component.comingSoon) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurface
-                        )
+                            style = MaterialTheme.typography.titleMedium)
                     }
-                    
+
                     Spacer(modifier = Modifier.height(4.dp))
-                    
+
                     Text(
                         text = component.description,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (component.comingSoon) MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f) else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                     
+                        style = MaterialTheme.typography.bodyMedium)
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (component.comingSoon) {
                             Box(
                                 modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f), RoundedCornerShape(4.dp))
-                                    .border(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.3f), RoundedCornerShape(4.dp))
+                                    .background(MaterialTheme.colorScheme.tertiaryContainer, androidx.compose.material3.MaterialTheme.shapes.extraSmall)
+                                    .border(1.dp, MaterialTheme.colorScheme.tertiaryContainer, androidx.compose.material3.MaterialTheme.shapes.extraSmall)
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             ) {
-                                Text("Coming Soon", fontSize = 10.sp, color = MaterialTheme.colorScheme.tertiary, fontWeight = FontWeight.Bold)
+                                Text("Coming Soon",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                         } else {
                             Text(
                                 text = "Size: ${component.sizeEstimate}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                            )
+                                style = MaterialTheme.typography.labelSmall)
                             if (isInstalled) {
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Box(
                                     modifier = Modifier
-                                        .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha=0.5f), RoundedCornerShape(4.dp))
+                                        .background(MaterialTheme.colorScheme.secondaryContainer, androidx.compose.material3.MaterialTheme.shapes.extraSmall)
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(10.dp))
+                                        Icon(Icons.Default.CheckCircle, contentDescription = null, modifier = Modifier.size(10.dp))
                                         Spacer(modifier = Modifier.width(4.dp))
-                                        Text("Installed", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.Bold)
+                                        Text("Installed",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                     }
                                 }
                             }
@@ -688,22 +574,16 @@ fun ComponentManagementGlassCard(
                             Button(
                                 onClick = onAction,
                                 enabled = !isGlobalInstalling,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isInstalled) MaterialTheme.colorScheme.surfaceVariant.copy(alpha=0.5f) else MaterialTheme.colorScheme.primary,
-                                    contentColor = if (isInstalled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary,
-                                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                    disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-                                ),
-                                shape = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(40.dp),
-                                elevation = ButtonDefaults.buttonElevation(0.dp)
-                            ) {
+                                modifier = Modifier.height(40.dp)) {
                                 if (isGlobalInstalling) {
-                                    Text("Busy...", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                    Text("Busy...",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 } else if (isInstalled) {
-                                    Text("Re-run", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                    Text("Re-run",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 } else {
-                                    Text("Install", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    Text("Install",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 }
                             }
 
@@ -724,21 +604,15 @@ fun ComponentManagementGlassCard(
                                     onClick = onUninstall,
                                     enabled = !isGlobalInstalling,
                                     modifier = Modifier.height(40.dp),
-                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)
-                                ) {
+                                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp)) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = "Uninstall ${component.name}",
-                                        tint = Color(0xFFFF5252).copy(alpha = if (isGlobalInstalling) 0.3f else 1f),
-                                        modifier = Modifier.size(16.dp)
-                                    )
+                                        modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         "Uninstall",
-                                        fontSize = 12.sp,
-                                        color = Color(0xFFFF5252).copy(alpha = if (isGlobalInstalling) 0.3f else 1f),
-                                        fontWeight = FontWeight.SemiBold
-                                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 }
                             }
 
@@ -747,20 +621,17 @@ fun ComponentManagementGlassCard(
                                 Spacer(modifier = Modifier.width(2.dp))
                                 IconButton(
                                     onClick = { expanded = !expanded },
-                                    modifier = Modifier.size(32.dp)
-                                ) {
+                                    modifier = Modifier.size(32.dp)) {
                                     Icon(
                                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                                        contentDescription = if (expanded) "Collapse" else "Expand",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                    )
+                                        contentDescription = if (expanded) "Collapse" else "Expand")
                                 }
                             }
                         }
                     }
                 }
             }
-            
+
             // Collapsible Content
             AnimatedVisibility(
                 visible = expanded,
@@ -769,16 +640,13 @@ fun ComponentManagementGlassCard(
             ) {
                 if (details != null) {
                     Column(modifier = Modifier.padding(top = 16.dp)) {
-                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f))
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "Included Packages",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.Bold
-                        )
+                            style = MaterialTheme.typography.labelSmall)
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         details.packages.forEach { (pkg, size) ->
                             Row(
                                 modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
@@ -786,15 +654,10 @@ fun ComponentManagementGlassCard(
                             ) {
                                 Text(
                                     text = "• $pkg",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                                )
+                                    style = MaterialTheme.typography.bodySmall)
                                 Text(
                                     text = size,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                    fontWeight = FontWeight.Medium
-                                )
+                                    style = MaterialTheme.typography.bodySmall)
                             }
                         }
                     }

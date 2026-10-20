@@ -78,7 +78,7 @@ import com.ivarna.fluxlinux.core.desktop.DesktopLauncher
 import com.ivarna.fluxlinux.core.legacy.LegacyTermuxBridge
 import com.ivarna.fluxlinux.core.legacy.LegacyTermuxStore
 import com.ivarna.fluxlinux.core.utils.StateManager
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -347,51 +347,35 @@ fun LegacyTermuxSettingsScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Legacy Termux",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
                 },
                 actions = {
                     IconButton(
                         onClick = { triggerScan() },
-                        enabled = !isBusy && termuxInstalled && termuxVersionOk && runCommandGranted
-                    ) {
+                        enabled = !isBusy && termuxInstalled && termuxVersionOk && runCommandGranted) {
                         if (pageState == LegacyPageState.SCANNING) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = MaterialTheme.colorScheme.secondary,
-                                strokeWidth = 2.dp
-                            )
+                                modifier = Modifier.size(20.dp))
                         } else {
                             Icon(
                                 Icons.Default.Refresh,
-                                contentDescription = "Scan",
-                                tint = MaterialTheme.colorScheme.onBackground
-                            )
+                                contentDescription = "Scan")
                         }
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -403,21 +387,15 @@ fun LegacyTermuxSettingsScreen(
             // Header Warning
             Column(modifier = Modifier.padding(horizontal = 4.dp)) {
                 Text(
-                    "Leftovers live in com.termux — not app storage",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                    "Leftovers live in com.termux — not app storage")
                 Spacer(Modifier.height(2.dp))
                 Text(
                     "These are containers inside the Termux app, not Settings → PRoot.",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
 
             // Prerequisites Card
-            GlassSettingCard {
+            SettingsCard {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -425,11 +403,7 @@ fun LegacyTermuxSettingsScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        "Prerequisites",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Prerequisites")
 
                     // Row 1: Termux App + Version
                     PrereqRow(
@@ -452,10 +426,7 @@ fun LegacyTermuxSettingsScreen(
                     if (termuxInstalled && !termuxVersionOk) {
                         Text(
                             "Play Store version will not work. Install v0.118.3 or newer from F-Droid or GitHub releases.",
-                            fontSize = 11.sp,
-                            color = MaterialTheme.colorScheme.error,
-                            lineHeight = 14.sp
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     // Row 2: Termux:X11
@@ -505,50 +476,34 @@ fun LegacyTermuxSettingsScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color(0xFF141414))
-                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                .clip(androidx.compose.material3.MaterialTheme.shapes.small)
+                                .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
+                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), androidx.compose.material3.MaterialTheme.shapes.small)
                                 .padding(12.dp),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text(
-                                "Fix: allow-external-apps = true",
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                                "Fix: allow-external-apps = true")
                             Text(
                                 FIX_COMMAND,
-                                color = Color(0xFF50FA7B),
-                                fontSize = 11.sp,
-                                fontFamily = FontFamily.Monospace
-                            )
+                                fontFamily = FontFamily.Monospace,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Button(
                                     onClick = { copyAndOpenTermux() },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.secondary,
-                                        contentColor = MaterialTheme.colorScheme.onSecondary
-                                    ),
-                                    modifier = Modifier.weight(1f).height(40.dp),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text("Copy & Open Termux", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    modifier = Modifier.weight(1f).height(40.dp)) {
+                                    Text("Copy & Open Termux",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 }
                                 OutlinedButton(
                                     onClick = { triggerPing() },
                                     enabled = canInteract,
-                                    colors = ButtonDefaults.outlinedButtonColors(
-                                        contentColor = MaterialTheme.colorScheme.secondary
-                                    ),
-                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)),
-                                    modifier = Modifier.height(40.dp),
-                                    shape = RoundedCornerShape(8.dp)
-                                ) {
-                                    Text("Ping", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                    modifier = Modifier.height(40.dp)) {
+                                    Text("Ping",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 }
                             }
                         }
@@ -558,7 +513,7 @@ fun LegacyTermuxSettingsScreen(
 
             // Timed out banner
             if (pageState == LegacyPageState.TIMED_OUT) {
-                GlassSettingCard {
+                SettingsCard {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -568,9 +523,7 @@ fun LegacyTermuxSettingsScreen(
                         Icon(
                             Icons.Default.Warning,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(22.dp)
-                        )
+                            modifier = Modifier.size(22.dp))
                         Spacer(Modifier.width(12.dp))
                         Text(
                             if (lastTimeoutType == LegacyTimeoutType.UNINSTALL) {
@@ -578,9 +531,7 @@ fun LegacyTermuxSettingsScreen(
                             } else {
                                 "Termux did not respond. Enable allow-external-apps = true and grant RUN_COMMAND."
                             },
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -589,10 +540,8 @@ fun LegacyTermuxSettingsScreen(
             if (scan.error != null) {
                 Text(
                     scan.error,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(horizontal = 4.dp)
-                )
+                    modifier = Modifier.padding(horizontal = 4.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
 
             // Discovered Leftovers Header
@@ -604,24 +553,18 @@ fun LegacyTermuxSettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Leftover Containers",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.secondary
-                )
+                    "Leftover Containers")
                 if (scan.scannedAtMs > 0) {
                     val ageMinutes = (System.currentTimeMillis() - scan.scannedAtMs) / 60000
                     Text(
                         if (ageMinutes <= 0) "Just scanned" else "Scanned ${ageMinutes}m ago",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
 
             // Rows list or Empty states
             if (!termuxInstalled) {
-                GlassSettingCard {
+                SettingsCard {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -632,25 +575,16 @@ fun LegacyTermuxSettingsScreen(
                         Icon(
                             Icons.Default.History,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary.copy(alpha = 0.6f),
-                            modifier = Modifier.size(40.dp)
-                        )
+                            modifier = Modifier.size(40.dp))
                         Text(
-                            "Termux Not Installed",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                            "Termux Not Installed")
                         Text(
                             "The Termux app is not installed. Leftover FluxLinux ≤ v1.8.0 containers lived there.",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     }
                 }
             } else if (scan.rows.isEmpty() && scan.scannedAtMs > 0 && scan.error == null) {
-                GlassSettingCard {
+                SettingsCard {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -661,21 +595,12 @@ fun LegacyTermuxSettingsScreen(
                         Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = null,
-                            tint = Color(0xFF50FA7B),
-                            modifier = Modifier.size(40.dp)
-                        )
+                            modifier = Modifier.size(40.dp))
                         Text(
-                            "No Leftovers Found",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                            "No Leftovers Found")
                         Text(
                             "No leftover PRoot containers found in Termux.",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                        )
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center)
                     }
                 }
             } else {
@@ -707,32 +632,21 @@ fun LegacyTermuxSettingsScreen(
                 Button(
                     onClick = { triggerScan() },
                     enabled = !isBusy,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary,
-                        disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
+                        .height(48.dp)) {
                     if (pageState == LegacyPageState.SCANNING) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = MaterialTheme.colorScheme.onSecondary,
-                            strokeWidth = 2.dp
-                        )
+                            modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Scanning Termux…", fontWeight = FontWeight.Bold)
+                        Text("Scanning Termux…")
                     } else {
                         Icon(
                             Icons.Default.Refresh,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Scan leftovers", fontWeight = FontWeight.Bold)
+                        Text("Scan leftovers")
                     }
                 }
             }
@@ -754,10 +668,7 @@ fun LegacyTermuxSettingsScreen(
             },
             title = {
                 Text(
-                    if (targetToConfirm.id == "debian") "Delete Legacy Debian Container?" else "Delete Termux Container?",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                    if (targetToConfirm.id == "debian") "Delete Legacy Debian Container?" else "Delete Termux Container?")
             },
             text = {
                 val promptText = if (targetToConfirm.id == "debian") {
@@ -766,10 +677,7 @@ fun LegacyTermuxSettingsScreen(
                     "Delete the Termux proot-distro container '${targetToConfirm.id}' (not installed by FluxLinux ≤ v1.8)?"
                 }
                 Text(
-                    "$promptText$pathText\n\nThis removes the container from Termux and does not touch FluxLinux app-storage (Settings → PRoot).",
-                    fontSize = 13.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    "$promptText$pathText\n\nThis removes the container from Termux and does not touch FluxLinux app-storage (Settings → PRoot).")
             },
             confirmButton = {
                 Button(
@@ -780,24 +688,17 @@ fun LegacyTermuxSettingsScreen(
                             triggerUninstall(toRemove)
                         }
                     },
-                    enabled = !isBusy,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
-                        contentColor = MaterialTheme.colorScheme.onError
-                    )
-                ) {
-                    Text("Uninstall", fontWeight = FontWeight.Bold)
+                    enabled = !isBusy) {
+                    Text("Uninstall")
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { confirmUninstallRow = null },
-                    enabled = !isBusy
-                ) {
-                    Text("Cancel", color = MaterialTheme.colorScheme.secondary)
+                    enabled = !isBusy) {
+                    Text("Cancel")
                 }
-            }
-        )
+            })
     }
 
     // Permission Help Dialog (Android 11+ / MIUI custom dangerous permission guidance)
@@ -806,24 +707,16 @@ fun LegacyTermuxSettingsScreen(
             onDismissRequest = { showPermissionHelpDialog = false },
             title = {
                 Text(
-                    "Grant RUN_COMMAND",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
+                    "Grant RUN_COMMAND")
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Text(
-                        "On modern Android, custom permissions like RUN_COMMAND must be enabled manually in App Info → Permissions → Additional Permissions / All Permissions.",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        "On modern Android, custom permissions like RUN_COMMAND must be enabled manually in App Info → Permissions → Additional Permissions / All Permissions.")
                     Text(
                         "Or grant via ADB:\npm grant ${context.packageName} com.termux.permission.RUN_COMMAND",
-                        fontSize = 11.sp,
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             },
             confirmButton = {
@@ -838,21 +731,15 @@ fun LegacyTermuxSettingsScreen(
                         } catch (e: Exception) {
                             Log.e(TAG, "Failed to open app settings", e)
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSecondary
-                    )
-                ) {
-                    Text("Open App Info", fontWeight = FontWeight.Bold)
+                    }) {
+                    Text("Open App Info")
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionHelpDialog = false }) {
-                    Text("Dismiss", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Dismiss")
                 }
-            }
-        )
+            })
     }
 }
 
@@ -870,24 +757,17 @@ private fun PrereqRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onBackground)
+            Text(title)
             Text(
                 statusText,
-                fontSize = 12.sp,
-                color = if (isOk) Color(0xFF50FA7B) else MaterialTheme.colorScheme.error
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
         if (ctaText != null && onCta != null) {
             Button(
                 onClick = onCta,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                modifier = Modifier.height(32.dp),
-                shape = RoundedCornerShape(6.dp)
-            ) {
-                Text(ctaText, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                modifier = Modifier.height(32.dp)) {
+                Text(ctaText,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -910,7 +790,7 @@ private fun LeftoverRowCard(
     val isDebianLeftover = row.id == "debian"
     val isNativeTermux = row.id == "termux"
 
-    GlassSettingCard {
+    SettingsCard {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -928,36 +808,28 @@ private fun LeftoverRowCard(
                         modifier = Modifier
                             .size(36.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.16f)),
+                            .background(MaterialTheme.colorScheme.secondaryContainer),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.History,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(20.dp)
-                        )
+                            modifier = Modifier.size(20.dp))
                     }
                     Spacer(Modifier.width(12.dp))
                     Column {
                         Text(
-                            row.id,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                            row.id)
                         Text(
                             formatBytes(row.bytes),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
                 Box(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                         .background(
-                            if (isDebianLeftover) MaterialTheme.colorScheme.secondary.copy(alpha = 0.15f)
+                            if (isDebianLeftover) MaterialTheme.colorScheme.secondaryContainer
                             else MaterialTheme.colorScheme.surfaceVariant
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -968,10 +840,7 @@ private fun LeftoverRowCard(
                             isNativeTermux -> "NATIVE"
                             else -> "OTHER TERMUX CONTAINER"
                         },
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isDebianLeftover) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
 
@@ -979,37 +848,27 @@ private fun LeftoverRowCard(
             if (!row.hostPath.isNullOrBlank()) {
                 Text(
                     row.hostPath,
-                    fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
 
             // Start disclaimer / conflict banner
             if (embeddedDesktopActive) {
                 Text(
                     "Stop the FluxLinux desktop first. Leftover Termux:X11 and embedded XFCE should not run together (Pulse TCP 127.0.0.1:4713).",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.error
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             } else if (isNativeTermux) {
                 Text(
                     "Termux native container management is not supported.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.error
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             } else if (isDebianLeftover) {
                 Text(
                     "Start: XFCE in Termux:X11 (v1.8 protocol). KDE leftovers are not supported.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             } else {
                 Text(
                     "Termux container (not installed by FluxLinux ≤ v1.8). Start: XFCE in Termux:X11 if installed inside container.",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
 
             // Action Buttons
@@ -1021,27 +880,17 @@ private fun LeftoverRowCard(
                     Button(
                         onClick = onLoginTerminal,
                         enabled = canInteract && !isNativeTermux,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        ),
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("Open terminal", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        modifier = Modifier.weight(1f).height(40.dp)) {
+                        Text("Open terminal",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     Button(
                         onClick = onStartDisplay,
                         enabled = canInteract && termuxX11Installed && !embeddedDesktopActive && !isNativeTermux,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        ),
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("Start display", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        modifier = Modifier.weight(1f).height(40.dp)) {
+                        Text("Start display",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
 
@@ -1052,35 +901,22 @@ private fun LeftoverRowCard(
                     OutlinedButton(
                         onClick = onStopDisplay,
                         enabled = canInteract && !isNativeTermux,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.secondary
-                        ),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)),
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text("Stop display", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        modifier = Modifier.weight(1f).height(40.dp)) {
+                        Text("Stop display",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     OutlinedButton(
                         onClick = onUninstall,
                         enabled = canUninstall && !isNativeTermux,
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.error
-                        ),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.7f)),
-                        modifier = Modifier.weight(1f).height(40.dp),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
+                        modifier = Modifier.weight(1f).height(40.dp)) {
                         if (isUninstallActive) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
-                                color = MaterialTheme.colorScheme.error,
-                                strokeWidth = 2.dp
-                            )
+                                modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(6.dp))
                         }
-                        Text("Uninstall", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        Text("Uninstall",
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }

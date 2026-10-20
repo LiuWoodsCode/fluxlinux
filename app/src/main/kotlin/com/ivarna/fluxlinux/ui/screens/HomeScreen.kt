@@ -64,17 +64,13 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeChild
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(
     permissionState: PermissionState,
-    hazeState: HazeState,
+
     scriptRefreshTrigger: Int = 0,
     onStartService: (android.content.Intent) -> Unit,
     onStartActivity: (android.content.Intent) -> Unit,
@@ -86,7 +82,7 @@ fun HomeScreen(
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
-    
+
     // State for Launch Popup
     val distroToLaunch = remember { mutableStateOf<com.ivarna.fluxlinux.core.data.Distro?>(null) }
     // State for KDE GPU mode picker (sub-dialog)
@@ -110,7 +106,7 @@ fun HomeScreen(
             showDesktopLogs = true
         }
     }
-    
+
     // Refresh key to trigger recomposition
     val refreshKey = remember { mutableStateOf(0) }
 
@@ -129,7 +125,7 @@ fun HomeScreen(
     val session = remember(desktopUi, stateRefresh, refreshKey.value) {
         DesktopSessionQuery.current(context, desktopUi)
     }
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -175,13 +171,10 @@ fun HomeScreen(
 
         Text(
             text = "Installed Distros",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.secondary,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
+                .padding(horizontal = 16.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
 
         val prootInstalled = installedDistros.filter { !it.isChrootCard() }
         val chrootInstalled = installedDistros.filter { it.isChrootCard() }
@@ -229,12 +222,10 @@ fun HomeScreen(
         if (methodTab == MethodTab.CHROOT && !rootAvailable && chrootInstalled.isNotEmpty()) {
             Text(
                 text = "Installed, but no root given to the app. Grant superuser to FluxLinux to start these guests.",
-                color = MaterialTheme.colorScheme.error.copy(alpha = 0.92f),
-                fontSize = 12.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -249,18 +240,12 @@ fun HomeScreen(
             ) {
                 Text(
                     text = "No distros installed yet",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center
-                )
+                    textAlign = TextAlign.Center,
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Install a distribution from the Distros tab",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                    textAlign = TextAlign.Center
-                )
+                    textAlign = TextAlign.Center)
             }
         } else if (visibleDistros.isEmpty()) {
             Column(
@@ -275,11 +260,7 @@ fun HomeScreen(
                     } else {
                         "No PRoot guests installed"
                     },
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    textAlign = TextAlign.Center
-                )
+                    textAlign = TextAlign.Center)
             }
         } else {
             visibleDistros.forEach { distro ->
@@ -345,8 +326,7 @@ fun HomeScreen(
             }
         }
 
-        // Keep the last card above the floating bottom nav (72 + 24*2 padding).
-        Spacer(modifier = Modifier.height(128.dp))
+        Spacer(modifier = Modifier.height(16.dp))
     }
 
     // Launch mode dialog (shell / root / desktop)
@@ -369,10 +349,10 @@ fun HomeScreen(
         ) {
             Surface(
                 modifier = Modifier.fillMaxWidth(0.92f),
-                shape = RoundedCornerShape(24.dp),
+                shape = androidx.compose.material3.MaterialTheme.shapes.large,
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 8.dp,
-                border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
+                border = BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant)
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
@@ -381,11 +361,11 @@ fun HomeScreen(
                     Box(
                         modifier = Modifier
                             .size(72.dp)
-                            .clip(RoundedCornerShape(20.dp))
-                            .background(accent.copy(alpha = 0.12f))
+                            .clip(androidx.compose.material3.MaterialTheme.shapes.large)
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer)
                             .border(
-                                BorderStroke(1.dp, accent.copy(alpha = 0.25f)),
-                                RoundedCornerShape(20.dp)
+                                BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer),
+                                androidx.compose.material3.MaterialTheme.shapes.large
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -399,9 +379,7 @@ fun HomeScreen(
                             Icon(
                                 imageVector = Icons.Filled.PlayArrow,
                                 contentDescription = null,
-                                tint = accent,
-                                modifier = Modifier.size(36.dp)
-                            )
+                                modifier = Modifier.size(36.dp))
                         }
                     }
 
@@ -409,16 +387,11 @@ fun HomeScreen(
 
                     Text(
                         text = "Start ${distro.name}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = titleColor
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                     Text(
                         text = "Choose launch mode",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = muted,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                        modifier = Modifier.padding(top = 4.dp))
 
                     Spacer(Modifier.height(22.dp))
 
@@ -427,13 +400,10 @@ fun HomeScreen(
                         icon = Icons.Filled.Terminal,
                         label = "Open Shell",
                         subtitle = "User session",
-                        containerColor = Color(0xFFF8BBD9),
-                        contentColor = Color(0xFF4A1028),
                         onClick = {
                             onOpenTerminal(distro.id, false)
                             distroToLaunch.value = null
-                        }
-                    )
+                        })
 
                     Spacer(Modifier.height(10.dp))
 
@@ -441,13 +411,10 @@ fun HomeScreen(
                         icon = Icons.Filled.AdminPanelSettings,
                         label = "Open Root Shell",
                         subtitle = "Privileged session",
-                        containerColor = Color(0xFFB71C1C),
-                        contentColor = Color.White,
                         onClick = {
                             onOpenTerminal(distro.id, true)
                             distroToLaunch.value = null
-                        }
-                    )
+                        })
 
                     if (llmInstalled && modelInstalled) {
                         Spacer(Modifier.height(10.dp))
@@ -455,8 +422,6 @@ fun HomeScreen(
                             icon = Icons.Filled.Psychology,
                             label = "Run Qwen2.5-1.5B",
                             subtitle = "In-app model session",
-                            containerColor = Color(0xFF5E35B1),
-                            contentColor = Color.White,
                             onClick = {
                                 val scriptManager = ScriptManager(context)
                                 val scriptContent = scriptManager.getScriptContent(
@@ -480,8 +445,7 @@ fun HomeScreen(
                                     }
                                 )
                                 distroToLaunch.value = null
-                            }
-                        )
+                            })
                     }
 
                     Spacer(Modifier.height(10.dp))
@@ -491,8 +455,6 @@ fun HomeScreen(
                         icon = Icons.Filled.DesktopWindows,
                         label = if (isCurrentSessionXfce) "Open XFCE4" else "Launch XFCE4",
                         subtitle = if (isCurrentSessionXfce) "Running on :0" else "Graphical desktop",
-                        containerColor = Color(0xFF6A1B9A),
-                        contentColor = Color.White,
                         onClick = {
                             if (session != null && session.distroId != distro.id) {
                                 android.widget.Toast.makeText(
@@ -519,8 +481,7 @@ fun HomeScreen(
                                     ).show()
                                 }
                             }
-                        }
-                    )
+                        })
 
                     Spacer(Modifier.height(10.dp))
 
@@ -529,16 +490,6 @@ fun HomeScreen(
                         icon = Icons.Filled.Widgets,
                         label = if (isCurrentSessionKde) "Open KDE Plasma" else if (kdeInstalled) "Launch KDE Plasma" else "Launch KDE",
                         subtitle = if (isCurrentSessionKde) "Running on :0" else if (kdeInstalled) "GPU mode picker" else "Not installed",
-                        containerColor = if (kdeInstalled) {
-                            Color(0xFF283593)
-                        } else {
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
-                        },
-                        contentColor = if (kdeInstalled) {
-                            Color.White
-                        } else {
-                            muted
-                        },
                         enabled = true,
                         onClick = {
                             if (session != null && session.distroId != distro.id) {
@@ -565,8 +516,7 @@ fun HomeScreen(
                                     android.widget.Toast.LENGTH_LONG
                                 ).show()
                             }
-                        }
-                    )
+                        })
 
                     if (isGuiRunning) {
                         Spacer(Modifier.height(10.dp))
@@ -574,29 +524,23 @@ fun HomeScreen(
                             icon = Icons.Filled.Stop,
                             label = if (runningType == "kde") "Stop KDE Plasma" else "Stop XFCE4",
                             subtitle = "End desktop session",
-                            containerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onError,
                             onClick = {
                                 DesktopLauncher.stop(context, distro.id)
                                 distroToLaunch.value = null
-                            }
-                        )
+                            })
                     }
 
                     Spacer(Modifier.height(8.dp))
 
                     TextButton(
                         onClick = { distroToLaunch.value = null },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        colors = ButtonDefaults.textButtonColors(contentColor = titleColor)
-                    ) {
+                        modifier = Modifier.fillMaxWidth().height(48.dp)) {
                         Icon(
                             imageVector = Icons.Filled.Close,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Cancel", fontWeight = FontWeight.SemiBold)
+                        Text("Cancel")
                     }
                 }
             }
@@ -677,12 +621,11 @@ private fun DesktopLogsDialog(
         scroll.animateScrollTo(scroll.maxValue)
     }
 
-    // Dark primary is near-black — prefer cream secondary + light surfaces for contrast.
     val titleColor = MaterialTheme.colorScheme.onBackground
     val accent = MaterialTheme.colorScheme.secondary
     val muted = MaterialTheme.colorScheme.onSurfaceVariant
-    val logFg = Color(0xFFE8EAED)
-    val logBg = Color(0xFF101214)
+    val logFg = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
+    val logBg = androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
     val phaseLabel = when (phase) {
         DesktopLauncher.Phase.Starting -> "Starting…"
         DesktopLauncher.Phase.Running -> "Running"
@@ -695,7 +638,7 @@ private fun DesktopLogsDialog(
     }
     val phaseTint = when (phase) {
         DesktopLauncher.Phase.Starting -> accent
-        DesktopLauncher.Phase.Running -> Color(0xFF69F0AE)
+        DesktopLauncher.Phase.Running -> androidx.compose.material3.MaterialTheme.colorScheme.primary
         DesktopLauncher.Phase.Idle -> muted
     }
 
@@ -707,7 +650,7 @@ private fun DesktopLogsDialog(
             modifier = Modifier
                 .fillMaxWidth(0.94f)
                 .fillMaxHeight(0.75f),
-            shape = RoundedCornerShape(20.dp),
+            shape = androidx.compose.material3.MaterialTheme.shapes.large,
             color = MaterialTheme.colorScheme.surface,
             tonalElevation = 6.dp
         ) {
@@ -724,40 +667,28 @@ private fun DesktopLogsDialog(
                         Icon(
                             imageVector = Icons.Filled.DesktopWindows,
                             contentDescription = null,
-                            tint = accent,
-                            modifier = Modifier.size(28.dp)
-                        )
+                            modifier = Modifier.size(28.dp))
                         Spacer(Modifier.width(10.dp))
                         Column {
                             Text(
                                 "Graphical Desktop Log",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = titleColor
-                            )
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = phaseIcon,
                                     contentDescription = null,
-                                    tint = phaseTint,
-                                    modifier = Modifier.size(14.dp)
-                                )
+                                    modifier = Modifier.size(14.dp))
                                 Spacer(Modifier.width(4.dp))
                                 Text(
                                     phaseLabel,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = phaseTint
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Filled.Close,
-                            contentDescription = "Close",
-                            tint = titleColor
-                        )
+                            contentDescription = "Close")
                     }
                 }
                 Spacer(Modifier.height(8.dp))
@@ -765,24 +696,21 @@ private fun DesktopLogsDialog(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
                         .background(logBg)
                         .border(
-                            BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)),
-                            RoundedCornerShape(12.dp)
+                            BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant),
+                            androidx.compose.material3.MaterialTheme.shapes.medium
                         )
                         .padding(12.dp)
                 ) {
                     Text(
                         text = logText.ifBlank { "Waiting for desktop output…" },
                         fontFamily = FontFamily.Monospace,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp,
-                        color = logFg,
                         modifier = Modifier
                             .fillMaxSize()
-                            .verticalScroll(scroll)
-                    )
+                            .verticalScroll(scroll),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
                 Spacer(Modifier.height(12.dp))
                 Row(
@@ -791,38 +719,24 @@ private fun DesktopLogsDialog(
                 ) {
                     OutlinedButton(
                         onClick = onCopy,
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = accent
-                        ),
-                        border = BorderStroke(1.5.dp, accent.copy(alpha = 0.75f))
-                    ) {
+                        modifier = Modifier.weight(1f).height(48.dp)) {
                         Icon(
                             imageVector = Icons.Filled.ContentCopy,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Copy", fontWeight = FontWeight.SemiBold)
+                        Text("Copy")
                     }
                     Button(
                         onClick = onOpenX11,
                         enabled = phase != DesktopLauncher.Phase.Idle,
-                        modifier = Modifier.weight(1f).height(48.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF00E5FF),
-                            contentColor = Color.Black,
-                            disabledContainerColor = Color(0xFF00E5FF).copy(alpha = 0.28f),
-                            disabledContentColor = Color.Black.copy(alpha = 0.45f)
-                        )
-                    ) {
+                        modifier = Modifier.weight(1f).height(48.dp)) {
                         Icon(
                             imageVector = Icons.Filled.OpenInNew,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text("Open X11", fontWeight = FontWeight.Bold)
+                        Text("Open X11")
                     }
                 }
             }
@@ -836,24 +750,13 @@ private fun LaunchModeAction(
     icon: ImageVector,
     label: String,
     subtitle: String,
-    containerColor: Color,
-    contentColor: Color,
     enabled: Boolean = true,
-    onClick: () -> Unit
-) {
+    onClick: () -> Unit) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            disabledContainerColor = containerColor.copy(alpha = 0.45f),
-            disabledContentColor = contentColor.copy(alpha = 0.55f)
-        ),
-        shape = RoundedCornerShape(16.dp),
         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
-        modifier = Modifier.fillMaxWidth().height(64.dp)
-    ) {
+        modifier = Modifier.fillMaxWidth().height(64.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
@@ -861,30 +764,22 @@ private fun LaunchModeAction(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(contentColor.copy(alpha = 0.14f)),
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    ,
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
-                    tint = contentColor,
-                    modifier = Modifier.size(22.dp)
-                )
+                    modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.Start) {
                 Text(
-                    label,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 15.sp,
-                    color = contentColor
-                )
+                    label)
                 Text(
                     subtitle,
-                    fontSize = 11.sp,
-                    color = contentColor.copy(alpha = 0.78f)
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
         }
     }
@@ -909,23 +804,13 @@ private fun KdeGpuPickerDialog(
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.92f)
-                .clip(RoundedCornerShape(28.dp))
+                .clip(androidx.compose.material3.MaterialTheme.shapes.large)
                 .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            Color(0xFF1E1E1E).copy(alpha = 0.95f),
-                            Color(0xFF121212).copy(alpha = 0.98f)
-                        )
-                    )
+                    androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                 )
                 .border(
-                    BorderStroke(1.dp, Brush.verticalGradient(
-                        listOf(
-                            Color.White.copy(alpha = 0.15f),
-                            Color.Transparent
-                        )
-                    )),
-                    RoundedCornerShape(28.dp)
+                    BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant),
+                    androidx.compose.material3.MaterialTheme.shapes.large
                 )
         ) {
             // Top glow
@@ -934,12 +819,7 @@ private fun KdeGpuPickerDialog(
                     .fillMaxWidth()
                     .height(100.dp)
                     .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                                Color.Transparent
-                            )
-                        )
+                        androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                     )
             )
 
@@ -951,23 +831,16 @@ private fun KdeGpuPickerDialog(
                     Icon(
                         imageVector = Icons.Filled.Widgets,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.size(28.dp)
-                    )
+                        modifier = Modifier.size(28.dp))
                     Spacer(Modifier.width(10.dp))
                     Text(
                         text = "KDE Plasma",
-                        style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Choose GPU Renderer",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    style = MaterialTheme.typography.bodyMedium)
 
                 Spacer(modifier = Modifier.height(28.dp))
 
@@ -985,10 +858,8 @@ private fun KdeGpuPickerDialog(
                         title = "Hardware",
                         subtitle = "Installed GPU driver",
                         description = "Turnip / PanVK / VirGL, whichever is installed. Best performance.",
-                        accentColor = Color(0xFFFF6F00),
                         badgeText = driverBadge,
-                        onClick = onSelectHardware
-                    )
+                        onClick = onSelectHardware)
 
                     // ── Software Card ───────────────────────
                     GpuOptionCard(
@@ -997,10 +868,8 @@ private fun KdeGpuPickerDialog(
                         title = "Software",
                         subtitle = "LLVMpipe",
                         description = "CPU-only. No GPU required. Works on all devices.",
-                        accentColor = Color(0xFF4CAF50),
                         badgeText = "Safe Fallback",
-                        onClick = onSelectSoftware
-                    )
+                        onClick = onSelectSoftware)
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))
@@ -1009,25 +878,21 @@ private fun KdeGpuPickerDialog(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White.copy(alpha = 0.05f))
-                        .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.08f)), RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant)
+                        .border(BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant), androidx.compose.material3.MaterialTheme.shapes.medium)
                         .padding(12.dp)
                 ) {
                     Row(verticalAlignment = Alignment.Top) {
                         Icon(
                             imageVector = Icons.Filled.Info,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
+                            modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(
                             text = "Hardware needs a GPU driver installed. Software works on any device (slower).",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.weight(1f)
-                        )
+                            modifier = Modifier.weight(1f))
                     }
                 }
 
@@ -1036,19 +901,13 @@ private fun KdeGpuPickerDialog(
 
                 TextButton(
                     onClick = onDismiss,
-                    shape = RoundedCornerShape(12.dp),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.onBackground
-                    )
-                ) {
+                    modifier = Modifier.fillMaxWidth()) {
                     Icon(
                         imageVector = Icons.Filled.Close,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
+                        modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Cancel", fontWeight = FontWeight.SemiBold)
+                    Text("Cancel")
                 }
             }
         }
@@ -1063,92 +922,23 @@ private fun GpuOptionCard(
     title: String,
     subtitle: String,
     description: String,
-    accentColor: Color,
     badgeText: String?,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = modifier
-            .clip(RoundedCornerShape(20.dp))
-            .background(
-                Brush.verticalGradient(
-                    listOf(
-                        accentColor.copy(alpha = 0.18f),
-                        accentColor.copy(alpha = 0.06f)
-                    )
-                )
-            )
-            .border(
-                BorderStroke(1.dp, accentColor.copy(alpha = 0.35f)),
-                RoundedCornerShape(20.dp)
-            )
-            .clickable(onClick = onClick)
-    ) {
+    onClick: () -> Unit) {
+    OutlinedCard(onClick = onClick, modifier = modifier) {
         Row(
             modifier = Modifier.padding(16.dp).fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(accentColor.copy(alpha = 0.22f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = accentColor,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(16.dp))
-
+            Icon(icon, contentDescription = null)
+            Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = title,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    if (badgeText != null) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(6.dp))
-                                .background(accentColor.copy(alpha = 0.25f))
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                text = badgeText,
-                                fontSize = 9.sp,
-                                color = accentColor,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                if (badgeText != null) {
+                    Text(badgeText, style = MaterialTheme.typography.labelSmall)
                 }
-
-                Text(
-                    text = subtitle,
-                    fontSize = 11.sp,
-                    color = accentColor,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = description,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Start,
-                    lineHeight = 15.sp
-                )
+                Text(subtitle, style = MaterialTheme.typography.bodyMedium)
+                Text(description, style = MaterialTheme.typography.bodySmall)
             }
         }
     }
 }
-

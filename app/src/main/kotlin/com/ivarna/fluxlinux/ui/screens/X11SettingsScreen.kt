@@ -47,10 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.utils.TermuxX11Preferences
 import com.ivarna.fluxlinux.ui.components.FluxSwitch
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
-import com.ivarna.fluxlinux.ui.theme.FluxCardFill
-import com.ivarna.fluxlinux.ui.theme.FluxHairline
-import com.ivarna.fluxlinux.ui.theme.FluxSwitchUncheckedTrack
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import com.ivarna.fluxlinux.ui.theme.fluxMutedText
 
 /**
@@ -82,31 +79,21 @@ fun X11SettingsScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "X11 Display",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -116,32 +103,21 @@ fun X11SettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "Changes apply to the embedded X11 display immediately (no external Termux:X11).",
-                fontSize = 13.sp,
-                color = fluxMutedText()
-            )
+                "Changes apply to the embedded X11 display immediately (no external Termux:X11).")
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Display",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Display")
                     Spacer(Modifier.height(16.dp))
 
                     Row(
                         Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text("Display scale", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+                        Text("Display scale")
                         Text(
-                            "${displayScale.toInt()}%",
-                            color = MaterialTheme.colorScheme.secondary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp
-                        )
+                            "${displayScale.toInt()}%")
                     }
                     Slider(
                         value = displayScale,
@@ -150,13 +126,7 @@ fun X11SettingsScreen(
                             TermuxX11Preferences.setDisplayScale(context, displayScale.toInt())
                         },
                         valueRange = 30f..300f,
-                        steps = 26,
-                        colors = SliderDefaults.colors(
-                            thumbColor = MaterialTheme.colorScheme.secondary,
-                            activeTrackColor = MaterialTheme.colorScheme.secondary,
-                            inactiveTrackColor = FluxSwitchUncheckedTrack
-                        )
-                    )
+                        steps = 26)
 
                     PrefDivider()
                     PrefSwitch(
@@ -191,14 +161,10 @@ fun X11SettingsScreen(
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Input",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Input")
                     Spacer(Modifier.height(12.dp))
                     PrefSwitch(
                         title = "Capture external pointer",
@@ -257,26 +223,14 @@ fun X11SettingsScreen(
                     TermuxX11Preferences.applyToTermux(context)
                     TermuxX11Preferences.openTermuxX11Preferences(context)
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = FluxCardFill,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
-                border = BorderStroke(1.dp, FluxHairline),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Icon(
                     Icons.Default.OpenInNew,
                     null,
-                    Modifier.size(18.dp),
-                    tint = MaterialTheme.colorScheme.secondary
-                )
+                    Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    "Open full X11 preferences",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                    "Open full X11 preferences")
             }
 
             Spacer(Modifier.height(16.dp))
@@ -286,18 +240,9 @@ fun X11SettingsScreen(
                     TermuxX11Preferences.applyToTermux(context)
                     Toast.makeText(context, "Applied to embedded X11", Toast.LENGTH_SHORT).show()
                 },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
                 Text(
-                    "Re-apply to running display",
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondary
-                )
+                    "Re-apply to running display")
             }
 
             Spacer(Modifier.height(40.dp))
@@ -308,7 +253,7 @@ fun X11SettingsScreen(
 @Composable
 private fun PrefDivider() {
     HorizontalDivider(
-        color = FluxHairline,
+        color = androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }
@@ -329,12 +274,9 @@ private fun PrefSwitch(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(Modifier.weight(1f).padding(end = 12.dp)) {
-            Text(title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Medium, fontSize = 15.sp)
+            Text(title)
             Text(
-                subtitle,
-                color = fluxMutedText(),
-                fontSize = 13.sp
-            )
+                subtitle)
         }
         FluxSwitch(checked = checked, onCheckedChange = onChange)
     }

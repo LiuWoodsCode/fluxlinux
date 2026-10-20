@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.R
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
 import com.termux.view.TerminalView
 
 /**
@@ -223,7 +222,7 @@ fun TerminalExtraKeys(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.9f))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         // ── Row 1: modifiers + core keys (equal weight, 44dp) ───────────────
         Row(modifier = Modifier.fillMaxWidth().height(44.dp)) {
@@ -287,7 +286,7 @@ private fun ModifierKey(
         modifier = modifier
             .fillMaxHeight()
             .background(
-                if (active) FluxAccentMagenta.copy(alpha = 0.85f)
+                if (active) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                 else MaterialTheme.colorScheme.surface
             )
             // R5: LOCKED (long-press) gets an outline ring + badge dot so it is
@@ -300,11 +299,7 @@ private fun ModifierKey(
     ) {
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = if (active) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurface
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         if (locked) {
             Box(
                 modifier = Modifier
@@ -328,10 +323,7 @@ private fun CoreKey(label: String, onClick: () -> Unit, modifier: Modifier = Mod
     ) {
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -353,9 +345,7 @@ private fun IconKey(
         Icon(
             painter = painter,
             contentDescription = contentDescription,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.width(22.dp).height(22.dp)
-        )
+            modifier = Modifier.width(22.dp).height(22.dp))
     }
 }
 
@@ -367,17 +357,13 @@ private fun TextKey(label: String, onClick: () -> Unit, width: Dp, active: Boole
             .width(width)
             .height(44.dp)
             .background(
-                if (active) FluxAccentMagenta.copy(alpha = 0.85f)
+                if (active) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                 else MaterialTheme.colorScheme.surface
             )
             .combinedClickable(onClick = onClick)
     ) {
         Text(
             text = label,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (active) MaterialTheme.colorScheme.onPrimary
-            else MaterialTheme.colorScheme.onSurface
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
     }
 }

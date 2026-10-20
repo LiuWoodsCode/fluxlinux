@@ -44,7 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.terminal.PulseHost
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import com.ivarna.fluxlinux.ui.theme.fluxMutedText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -115,37 +115,27 @@ fun AudioSettingsScreen(
     val healthy = status?.healthy == true
     val statusColor = when {
         status == null -> fluxMutedText()
-        healthy -> Color(0xFF69F0AE)
+        healthy -> androidx.compose.material3.MaterialTheme.colorScheme.primary
         running -> MaterialTheme.colorScheme.secondary
-        else -> Color(0xFFFF8A80)
+        else -> androidx.compose.material3.MaterialTheme.colorScheme.error
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Audio",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -155,32 +145,19 @@ fun AudioSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                "Host PulseAudio in the FluxLinux prefix. Guests connect with PULSE_SERVER=tcp:127.0.0.1. Stopping the desktop does not stop this service.",
-                fontSize = 13.sp,
-                color = fluxMutedText()
-            )
+                "Host PulseAudio in the FluxLinux prefix. Guests connect with PULSE_SERVER=tcp:127.0.0.1. Stopping the desktop does not stop this service.")
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Host server",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Host server")
                     Spacer(Modifier.height(12.dp))
                     Text(
                         if (busy && status == null) "Checking…" else (status?.label ?: "Checking…"),
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = statusColor
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                     Spacer(Modifier.height(6.dp))
                     Text(
-                        status?.detail ?: "Querying pulseaudio --check and pactl info…",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        status?.detail ?: "Querying pulseaudio --check and pactl info…")
                     Spacer(Modifier.height(16.dp))
                     Row(
                         Modifier.fillMaxWidth(),
@@ -190,12 +167,8 @@ fun AudioSettingsScreen(
                         OutlinedButton(
                             onClick = { loadStatus() },
                             enabled = !busy,
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.secondary
-                            )
-                        ) {
-                            Text("Refresh", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.weight(1f).height(48.dp)) {
+                            Text("Refresh")
                         }
                         Button(
                             onClick = {
@@ -206,35 +179,21 @@ fun AudioSettingsScreen(
                                 }
                             },
                             enabled = !busy,
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
-                            )
-                        ) {
+                            modifier = Modifier.weight(1f).height(48.dp)) {
                             Text(
-                                if (running) "Restart" else "Start",
-                                fontWeight = FontWeight.Bold
-                            )
+                                if (running) "Restart" else "Start")
                         }
                     }
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Logs",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Logs")
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Supervisor and status output from this app (start_pulse_host.sh).",
-                        fontSize = 13.sp,
-                        color = fluxMutedText()
-                    )
+                        "Supervisor and status output from this app (start_pulse_host.sh).")
                     Spacer(Modifier.height(12.dp))
                     Row(
                         Modifier.fillMaxWidth(),
@@ -242,12 +201,8 @@ fun AudioSettingsScreen(
                     ) {
                         OutlinedButton(
                             onClick = { showLogs = !showLogs },
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.secondary
-                            )
-                        ) {
-                            Text(if (showLogs) "Hide logs" else "View logs", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.weight(1f).height(48.dp)) {
+                            Text(if (showLogs) "Hide logs" else "View logs")
                         }
                         OutlinedButton(
                             onClick = {
@@ -259,45 +214,32 @@ fun AudioSettingsScreen(
                                 Toast.makeText(context, "Log copied", Toast.LENGTH_SHORT).show()
                             },
                             enabled = logText.isNotBlank(),
-                            modifier = Modifier.weight(1f).height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.secondary
-                            )
-                        ) {
-                            Text("Copy", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.weight(1f).height(48.dp)) {
+                            Text("Copy")
                         }
                     }
                     if (showLogs) {
                         Spacer(Modifier.height(12.dp))
                         Text(
                             text = logText.ifBlank { "(no log yet — tap Refresh or Start)" },
-                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = Color(0xFFE8EAED),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .heightIn(min = 160.dp, max = 360.dp)
                                 .verticalScroll(rememberScrollState())
-                                .padding(4.dp)
-                        )
+                                .padding(4.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Guest clients",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Guest clients")
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Writes PULSE_SERVER=tcp:127.0.0.1 and installs pactl in already-installed PRoots. Chroots need root. Does not start a guest Pulse daemon.",
-                        fontSize = 13.sp,
-                        color = fluxMutedText()
-                    )
+                        "Writes PULSE_SERVER=tcp:127.0.0.1 and installs pactl in already-installed PRoots. Chroots need root. Does not start a guest Pulse daemon.")
                     Spacer(Modifier.height(12.dp))
                     OutlinedButton(
                         onClick = {
@@ -307,12 +249,8 @@ fun AudioSettingsScreen(
                             ) { PulseHost.repairGuests(it) }
                         },
                         enabled = !busy,
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = MaterialTheme.colorScheme.secondary
-                        )
-                    ) {
-                        Text("Repair guests", fontWeight = FontWeight.Bold)
+                        modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                        Text("Repair guests")
                     }
                 }
             }

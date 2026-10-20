@@ -76,7 +76,6 @@ import com.ivarna.fluxlinux.core.utils.TerminalPreferences
 import com.ivarna.fluxlinux.ui.terminal.TerminalExtraKeys
 import com.ivarna.fluxlinux.ui.terminal.TerminalModifierState
 import com.ivarna.fluxlinux.ui.terminal.TerminalToolSelector
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
 import com.termux.view.TerminalView
 import com.termux.view.TerminalViewClient
 
@@ -214,26 +213,17 @@ fun TerminalScreen(
                         terminalViewRef?.let { com.ivarna.fluxlinux.ui.terminal.hideIme(it) }
                         onBack.invoke()
                     },
-                    modifier = Modifier.size(36.dp),
-                    colors = IconButtonDefaults.filledTonalIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurface
-                    )
-                ) {
+                    modifier = Modifier.size(36.dp)) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        modifier = Modifier.size(20.dp)
-                    )
+                        modifier = Modifier.size(20.dp))
                 }
             }
             Text(
                 text = "Terminal",
                 style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(start = if (onBack == null) 8.dp else 8.dp)
-            )
+                modifier = Modifier.padding(start = if (onBack == null) 8.dp else 8.dp))
             Spacer(Modifier.weight(1f))
             IconButton(
                 onClick = {
@@ -242,26 +232,19 @@ fun TerminalScreen(
                     TerminalPreferences.setExtraKeysEnabled(context, next)
                     terminalViewRef?.let { forceTerminalResize(it) }
                 },
-                modifier = Modifier.size(36.dp)
-            ) {
+                modifier = Modifier.size(36.dp)) {
                 Icon(
                     imageVector = if (showExtraKeys) Icons.Default.Keyboard else Icons.Default.KeyboardHide,
                     contentDescription = if (showExtraKeys) "Hide extra keys" else "Show extra keys",
-                    tint = if (showExtraKeys) FluxAccentMagenta
-                    else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
+                    modifier = Modifier.size(20.dp))
             }
             IconButton(
                 onClick = { showNewSessionSheet = true },
-                modifier = Modifier.size(36.dp)
-            ) {
+                modifier = Modifier.size(36.dp)) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "New session",
-                    tint = FluxAccentMagenta,
-                    modifier = Modifier.size(20.dp)
-                )
+                    modifier = Modifier.size(20.dp))
             }
         }
 
@@ -284,18 +267,18 @@ fun TerminalScreen(
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                                 .background(
-                                    if (selected) FluxAccentMagenta.copy(alpha = 0.22f)
+                                    if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                                     else MaterialTheme.colorScheme.surfaceVariant
                                 )
                                 .border(
                                     BorderStroke(
                                         if (selected) 1.5.dp else 1.dp,
-                                        if (selected) FluxAccentMagenta
-                                        else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                                        if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.outlineVariant
                                     ),
-                                    RoundedCornerShape(10.dp)
+                                    androidx.compose.material3.MaterialTheme.shapes.small
                                 )
                                 .clickable { FluxTerminalSessionManager.switchSession(i) },
                             contentAlignment = Alignment.Center
@@ -325,9 +308,7 @@ fun TerminalScreen(
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close",
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.size(10.dp)
-                                )
+                                    modifier = Modifier.size(10.dp))
                             }
                         }
                     }

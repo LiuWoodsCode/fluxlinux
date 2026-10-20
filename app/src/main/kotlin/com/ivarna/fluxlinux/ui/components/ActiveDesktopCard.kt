@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.data.DistroRepository
 import com.ivarna.fluxlinux.core.desktop.DesktopSession
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
 
 @Composable
 fun ActiveDesktopCard(
@@ -38,9 +37,9 @@ fun ActiveDesktopCard(
     modifier: Modifier = Modifier
 ) {
     val colors = MaterialTheme.colorScheme
-    val cardShape = RoundedCornerShape(16.dp)
+    val cardShape = androidx.compose.material3.MaterialTheme.shapes.medium
     val isRunning = session.phase == DesktopSession.Phase.Running
-    val statusColor = if (isRunning) Color(0xFF4CAF50) else Color(0xFFFFA000)
+    val statusColor = if (isRunning) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.primary
     val deName = if (session.type == DesktopSession.Type.KDE) "KDE Plasma" else "XFCE4"
     val titleText = if (isRunning) {
         "${session.distroName} desktop is running"
@@ -53,31 +52,8 @@ fun ActiveDesktopCard(
     val distro = DistroRepository.supportedDistros.find { it.id == session.distroId }
     val iconRes = distro?.iconRes
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(cardShape)
-            .background(colors.surface.copy(alpha = 0.88f))
-            .border(BorderStroke(1.dp, Color.White.copy(alpha = 0.20f)), cardShape)
-            .semantics(mergeDescendants = true) {
-                contentDescription = a11yDesc
-            }
-    ) {
-        // Leading status indicator bar
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .matchParentSize()
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
-                    .width(4.dp)
-                    .background(statusColor)
-            )
-        }
-
+    androidx.compose.material3.OutlinedCard(
+        modifier = modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -90,9 +66,9 @@ fun ActiveDesktopCard(
                 Box(
                     modifier = Modifier
                         .size(40.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(colors.surfaceVariant.copy(alpha = 0.6f))
-                        .border(BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.3f)), RoundedCornerShape(10.dp)),
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.small)
+                        .background(colors.surfaceVariant)
+                        .border(BorderStroke(1.dp, colors.outlineVariant), androidx.compose.material3.MaterialTheme.shapes.small),
                     contentAlignment = Alignment.Center
                 ) {
                     if (iconRes != null) {
@@ -105,9 +81,7 @@ fun ActiveDesktopCard(
                         Icon(
                             imageVector = Icons.Filled.DesktopWindows,
                             contentDescription = null,
-                            tint = colors.secondary,
-                            modifier = Modifier.size(24.dp)
-                        )
+                            modifier = Modifier.size(24.dp))
                     }
                 }
 
@@ -116,18 +90,11 @@ fun ActiveDesktopCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = titleText,
-                        color = colors.onSurface,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 16.sp,
-                        maxLines = 1
-                    )
+                        maxLines = 1)
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = subtitleText,
-                        color = colors.onSurfaceVariant.copy(alpha = 0.90f),
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
 
@@ -141,26 +108,17 @@ fun ActiveDesktopCard(
                     label = "Open",
                     icon = Icons.AutoMirrored.Filled.OpenInNew,
                     onClick = onOpen,
-                    containerColor = FluxAccentCyan,
-                    contentColor = Color.Black,
-                    modifier = Modifier.weight(1f)
-                )
+                    modifier = Modifier.weight(1f))
                 CompactAction(
                     label = "Stop",
                     icon = Icons.Default.Stop,
                     onClick = onStop,
-                    containerColor = com.ivarna.fluxlinux.ui.theme.FluxDanger,
-                    contentColor = Color.White,
-                    modifier = Modifier.weight(0.85f)
-                )
+                    modifier = Modifier.weight(0.85f))
                 CompactAction(
                     label = "Logs",
                     icon = Icons.AutoMirrored.Filled.Article,
                     onClick = onLogs,
-                    containerColor = colors.secondaryContainer,
-                    contentColor = colors.onSecondaryContainer,
-                    modifier = Modifier.weight(0.85f)
-                )
+                    modifier = Modifier.weight(0.85f))
             }
         }
     }

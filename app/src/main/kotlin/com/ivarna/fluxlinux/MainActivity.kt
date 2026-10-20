@@ -33,8 +33,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.isGranted
 import com.ivarna.fluxlinux.ui.components.BottomTab
-import com.ivarna.fluxlinux.ui.components.GlassBottomNavigation
-import com.ivarna.fluxlinux.ui.components.GlassScaffold
+import com.ivarna.fluxlinux.ui.components.AppBottomNavigation
+import com.ivarna.fluxlinux.ui.components.AppScaffold
 import com.ivarna.fluxlinux.ui.theme.FluxLinuxTheme
 import com.ivarna.fluxlinux.core.utils.StateManager
 import com.ivarna.fluxlinux.core.utils.ThemePreferences
@@ -44,10 +44,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.HazeStyle
-import dev.chrisbanes.haze.hazeChild
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
 
 // Screen navigation enum
 enum class Screen {
@@ -71,7 +67,7 @@ enum class Screen {
 }
 
 class MainActivity : ComponentActivity() {
-    
+
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         handleScriptCallback(intent)
@@ -102,9 +98,9 @@ class MainActivity : ComponentActivity() {
             val result = uri?.getQueryParameter("result")
             val scriptName = uri?.getQueryParameter("name") ?: "unknown"
             val installedComponents = uri?.getQueryParameter("components") // Legacy
-            
+
             android.util.Log.d("FluxLinux", "Deep Link received: result=$result, scriptName=$scriptName")
-            
+
             if (scriptName.startsWith("legacy_termux_")) {
                 com.ivarna.fluxlinux.core.legacy.LegacyTermuxCallbacks.handle(this, result, scriptName, uri)
                 consumeCallbackIntent()
@@ -115,7 +111,7 @@ class MainActivity : ComponentActivity() {
                  // Check Queue first
                  val queueManager = com.ivarna.fluxlinux.core.utils.InstallationQueueManager
                  val currentTask = queueManager.currentTask
-                 
+
                  // If the callback matches the current task, proceed queue.
                  // Strict match: the script's callback name must equal the current task's id.
                  // The previous `|| scriptName == "base_install"` fallback was redundant
@@ -125,7 +121,7 @@ class MainActivity : ComponentActivity() {
                  // for the wrong distro.
                  if (currentTask != null && scriptName == currentTask.id) {
                      android.widget.Toast.makeText(this, "Task '${currentTask.name}' Complete. Proceeding...", android.widget.Toast.LENGTH_SHORT).show()
-                     
+
                      if (currentTask.type == com.ivarna.fluxlinux.core.utils.TaskType.BASE_INSTALL) {
                          // Mark Distro Installed on Base Success
                          // We assume we know the distro ID from state or we just mark currently selected?
@@ -142,11 +138,11 @@ class MainActivity : ComponentActivity() {
                          // We'll trust the processNextInstallTask logic to handle the flow.
                          // Marking distro installed:
                          // We can iterate Distros and match ID? Or just skip marking if ID not known?
-                         // The Base Script DOES NOT include ID in "name=base_install". 
+                         // The Base Script DOES NOT include ID in "name=base_install".
                          // However, InstallQueueManager is singleton. We can store context there?
                          // Let's just process queue. The user will see "Installed" in UI eventually.
                      }
-                     
+
                      // Mark Component as Installed in StateManager
                      val distroId = currentTask.distroId
                      if (currentTask.type == com.ivarna.fluxlinux.core.utils.TaskType.COMPONENT) {
@@ -177,10 +173,10 @@ class MainActivity : ComponentActivity() {
                          android.widget.Toast.makeText(this, "Script '$scriptName' details saved.", android.widget.Toast.LENGTH_SHORT).show()
                      }
                  }
-                 
+
                  // Process Next
                  processNextInstallTask()
-                 
+
             } else {
                  // Component failed
                  android.widget.Toast.makeText(this, "Task '$scriptName' failed! ❌", android.widget.Toast.LENGTH_LONG).show()
@@ -529,7 +525,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
     }
 
-    @OptIn(ExperimentalPermissionsApi::class, ExperimentalHazeMaterialsApi::class)
+    @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GpuDriverInstaller.onPending = { runOnUiThread { armDriverResume() } }
@@ -539,10 +535,7 @@ class MainActivity : ComponentActivity() {
         }
         requestNotificationPermissionIfNeeded()
         setContent {
-            // Force Permanent Dark Mode
-            val currentThemeMode = com.ivarna.fluxlinux.core.utils.ThemeMode.DARK
-            
-            FluxLinuxTheme(themeMode = currentThemeMode) {
+            FluxLinuxTheme {
                 val onboardingComplete = StateManager.isOnboardingComplete(this@MainActivity)
                 val showPhantomPrompt by com.ivarna.fluxlinux.core.system.PhantomProcessFixer.promptVisible.collectAsState()
                 if (showPhantomPrompt) {
@@ -572,11 +565,9 @@ class MainActivity : ComponentActivity() {
                                 "Your v1.x distros live in the Termux app and were not removed by this update. " +
                                     "FluxLinux 2 uses its own runtime; reinstall distros here.\n\n" +
                                     "Old data is still in Termux. Back up with `proot-distro backup <name>` " +
-                                    "in Termux, or delete it in Settings -> Legacy Termux."
-                            )
+                                    "in Termux, or delete it in Settings -> Legacy Termux.")
                         },
-                        confirmButton = { TextButton(onClick = dismissV1Notice) { Text("OK") } }
-                    )
+                        confirmButton = { TextButton(onClick = dismissV1Notice) { Text("OK") } })
                 }
 
                 // Permission State (Lifted for Settings and Home access)
@@ -585,12 +576,12 @@ class MainActivity : ComponentActivity() {
                 )
 
                 // Navigation state
-                var currentScreen by remember { 
-                    mutableStateOf(if (onboardingComplete) Screen.HOME else Screen.ONBOARDING) 
+                var currentScreen by remember {
+                    mutableStateOf(if (onboardingComplete) Screen.HOME else Screen.ONBOARDING)
                 }
                 currentScreenRef = remember { kotlinx.coroutines.flow.MutableStateFlow(currentScreen) }
                 LaunchedEffect(currentScreen) { currentScreenRef?.value = currentScreen }
-                
+
                 var currentTab by remember { mutableStateOf(BottomTab.HOME) }
                 currentTabRef = remember { kotlinx.coroutines.flow.MutableStateFlow(currentTab) }
                 LaunchedEffect(currentTab) { currentTabRef?.value = currentTab }
@@ -642,16 +633,16 @@ class MainActivity : ComponentActivity() {
                         finish()
                     }
                 }
-                
+
                 // Selected Distro for Wizard/Settings
                 var selectedDistro by remember { mutableStateOf<com.ivarna.fluxlinux.core.data.Distro?>(null) }
                 // Selected target id for Chroot/PRoot storage detail
                 var storageTargetId by remember { mutableStateOf<String?>(null) }
-                
+
                 // Refresh key to force UI update on resume
                 // Collected from StateManager for remote triggers too
                 val refreshKey by com.ivarna.fluxlinux.core.utils.StateManager.refreshTrigger.collectAsState()
-                
+
                 // ALSO react to Lifecycle
                 var lifecycleRefreshKey by remember { mutableStateOf(0) }
                 val lifecycleOwner = LocalLifecycleOwner.current
@@ -664,7 +655,7 @@ class MainActivity : ComponentActivity() {
                     lifecycleOwner.lifecycle.addObserver(observer)
                     onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
                 }
-                
+
                 // Helpers for service/activity
                 val onStartServiceStub: (android.content.Intent) -> Unit = { intent ->
                     try { startService(intent) } catch (e: Exception) { android.util.Log.e("FluxLinux", "StartService failed", e) }
@@ -672,7 +663,7 @@ class MainActivity : ComponentActivity() {
                 val onStartActivityStub: (android.content.Intent) -> Unit = { intent ->
                     try { startActivity(intent) } catch (e: Exception) { android.util.Log.e("FluxLinux", "StartActivity failed", e) }
                 }
-                
+
                 // Navigation Callbacks
                 val onNavigateToInstall: (com.ivarna.fluxlinux.core.data.Distro) -> Unit = { distro ->
                     selectedDistro = distro
@@ -752,17 +743,16 @@ class MainActivity : ComponentActivity() {
                         )
                     }
 
-                
+
                 @Composable
                 fun MainScreenContent(
                     tab: BottomTab,
-                    hazeState: HazeState
                 ) {
                     when (tab) {
                         BottomTab.HOME -> {
                             com.ivarna.fluxlinux.ui.screens.HomeScreen(
                                 permissionState = permissionState,
-                                hazeState = hazeState,
+
                                 scriptRefreshTrigger = refreshKey + lifecycleRefreshKey,
                                 onStartService = onStartServiceStub,
                                 onStartActivity = onStartActivityStub,
@@ -776,7 +766,7 @@ class MainActivity : ComponentActivity() {
                         BottomTab.DISTROS -> {
                             com.ivarna.fluxlinux.ui.screens.DistroScreen(
                                 permissionState = permissionState,
-                                hazeState = hazeState,
+
                                 onStartService = onStartServiceStub,
                                 onStartActivity = onStartActivityStub,
                                 onNavigateToInstall = onNavigateToInstall
@@ -791,98 +781,37 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // Helper for Top Bar
+                @OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
                 @Composable
                 fun TopBar(
-                    hazeState: HazeState,
                     onSettingsClick: () -> Unit,
                     onTerminalClick: () -> Unit,
                     onOpenDisplay: () -> Unit,
                     displayLive: Boolean,
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .hazeChild(
-                                state = hazeState,
-                                style = HazeStyle(
-                                    backgroundColor = MaterialTheme.colorScheme.background.copy(alpha = 0.7f),
-                                    blurRadius = 20.dp,
-                                    tint = null
-                                )
-                            )
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 12.dp)
-                                .windowInsetsPadding(WindowInsets.statusBars),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_logo),
-                                    contentDescription = "Logo",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = "FluxLinux",
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontSize = 20.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                if (!displayLive && com.ivarna.fluxlinux.core.terminal.TerminalLauncher.isBootstrapExtracted(LocalContext.current)) {
-                                   Text(
-                                       text = "Host: embedded",
-                                       style = MaterialTheme.typography.labelSmall,
-                                       color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
-                                       modifier = Modifier.padding(end = 4.dp)
-                                   )
-                                }
-
-                                IconButton(onClick = onOpenDisplay) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = Icons.Default.DesktopWindows,
-                                            contentDescription = if (displayLive) "Open X11 display — desktop running" else "Open X11 display",
-                                            tint = MaterialTheme.colorScheme.onBackground
-                                        )
-                                        if (displayLive) {
-                                            Box(
-                                                modifier = Modifier
-                                                    .size(8.dp)
-                                                    .align(Alignment.TopEnd)
-                                                    .clip(CircleShape)
-                                                    .background(Color(0xFF69F0AE))
-                                            )
-                                        }
+                    androidx.compose.material3.TopAppBar(
+                        title = { Text("FluxLinux") },
+                        actions = {
+                            IconButton(onClick = onOpenDisplay) {
+                                androidx.compose.material3.BadgedBox(
+                                    badge = {
+                                        if (displayLive) androidx.compose.material3.Badge()
                                     }
-                                }
-
-                                IconButton(onClick = onTerminalClick) {
+                                ) {
                                     Icon(
-                                        imageVector = Icons.Default.Terminal,
-                                        contentDescription = "Terminal",
-                                        tint = MaterialTheme.colorScheme.onBackground
-                                    )
-                                }
-                                IconButton(onClick = onSettingsClick) {
-                                    Icon(
-                                        imageVector = Icons.Default.Settings,
-                                        contentDescription = "Settings",
-                                        tint = MaterialTheme.colorScheme.onBackground
-                                    )
+                                        Icons.Default.DesktopWindows,
+                                        contentDescription = if (displayLive) "Open X11 display — desktop running" else "Open X11 display")
                                 }
                             }
-                        }
-                    }
+                            IconButton(onClick = onTerminalClick) {
+                                Icon(Icons.Default.Terminal, contentDescription = "Terminal")
+                            }
+                            IconButton(onClick = onSettingsClick) {
+                                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                            }
+                        })
                 }
-                
+
                 // Show appropriate screen based on state
                 when (currentScreen) {
                     Screen.ONBOARDING -> {
@@ -909,7 +838,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     Screen.HOME -> {
-                        val hazeState = remember { HazeState() }
+
                         val showTopBar = currentTab != BottomTab.TERMINAL
                         val desktopUi by com.ivarna.fluxlinux.core.desktop.DesktopLauncher.uiState.collectAsState()
                         val stateRefresh by com.ivarna.fluxlinux.core.utils.StateManager.refreshTrigger.collectAsState()
@@ -923,13 +852,12 @@ class MainActivity : ComponentActivity() {
                             }
                         }
 
-                        GlassScaffold(
-                            hazeState = hazeState,
-                            blurContent = currentTab == BottomTab.HOME,
+                        AppScaffold(
+
                             topBar = {
                                 if (showTopBar) {
                                     TopBar(
-                                        hazeState = hazeState,
+
                                         onSettingsClick = { currentScreen = Screen.SETTINGS },
                                         onTerminalClick = { currentTab = BottomTab.TERMINAL },
                                         onOpenDisplay = {
@@ -941,17 +869,15 @@ class MainActivity : ComponentActivity() {
                             },
                             bottomBar = {
                                 if (currentTab != BottomTab.TERMINAL) {
-                                    GlassBottomNavigation(
+                                    AppBottomNavigation(
                                         selectedTab = currentTab,
                                         onTabSelected = { currentTab = it },
-                                        hazeState = hazeState
                                     )
                                 }
                             }
                         ) {
                             MainScreenContent(
                                 tab = currentTab,
-                                hazeState = hazeState
                             )
                         }
                     }
@@ -1103,14 +1029,14 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     Screen.INSTALL_WIZARD -> {
-                         val hazeState = remember { HazeState() }
+
                          if (selectedDistro != null) {
                              // Shared runner with onboarding: rootfs + XFCE + customization
                              // for both proot and chroot (no feature modules).
                              com.ivarna.fluxlinux.ui.screens.InstallConfigScreen(
                                  distro = selectedDistro!!,
                                  onBack = { currentScreen = Screen.HOME },
-                                 hazeState = hazeState,
+
                                  onInstallComplete = {
                                      currentScreen = Screen.HOME
                                      currentTab = BottomTab.HOME
@@ -1121,12 +1047,12 @@ class MainActivity : ComponentActivity() {
                          }
                     }
                     Screen.DISTRO_SETTINGS -> {
-                         val hazeState = remember { HazeState() }
+
                          if (selectedDistro != null) {
                               com.ivarna.fluxlinux.ui.screens.DistroSettingsScreen(
                                   distro = selectedDistro!!,
                                   onBack = { currentScreen = Screen.HOME },
-                                  hazeState = hazeState,
+
                                    onInstallComponent = { component, extraEnv ->
                                        // Embedded: run component script inside the guest via
                                        // the same terminal component as the parent distro.

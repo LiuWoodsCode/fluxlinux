@@ -52,11 +52,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ivarna.fluxlinux.ui.theme.BrandCream
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
-import com.ivarna.fluxlinux.ui.theme.FluxDarkGrey
-import com.ivarna.fluxlinux.ui.theme.FluxHairline
 
 /**
  * Shared install progress UI for onboarding + Distros [InstallConfigScreen].
@@ -114,20 +109,14 @@ fun InstallProgressPanel(
                         isDone -> "Install Complete"
                         else -> "Setting Up Environment"
                     },
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.onBackground
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = when {
                         failed -> "An error occurred during execution"
                         isDone -> "All base packages and configs are installed"
                         else -> "Downloading rootfs & configuring packages"
-                    },
-                    fontSize = 13.sp,
-                    color = colors.onBackground.copy(alpha = 0.65f)
-                )
+                    })
             }
 
             // Status Indicator Badge
@@ -137,17 +126,17 @@ fun InstallProgressPanel(
                     .clip(CircleShape)
                     .background(
                         when {
-                            failed -> colors.error.copy(alpha = 0.15f)
-                            isDone -> Color(0xFF69F0AE).copy(alpha = 0.15f)
-                            else -> FluxAccentMagenta.copy(alpha = 0.15f)
+                            failed -> colors.errorContainer
+                            isDone -> androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                            else -> androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                         }
                     )
                     .border(
                         1.dp,
                         when {
-                            failed -> colors.error.copy(alpha = 0.4f)
-                            isDone -> Color(0xFF69F0AE).copy(alpha = 0.4f)
-                            else -> FluxAccentMagenta.copy(alpha = 0.4f)
+                            failed -> colors.errorContainer
+                            isDone -> androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                            else -> androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                         },
                         CircleShape
                     ),
@@ -160,25 +149,19 @@ fun InstallProgressPanel(
                         else -> Icons.Filled.Refresh
                     },
                     contentDescription = null,
-                    tint = when {
-                        failed -> colors.error
-                        isDone -> Color(0xFF69F0AE)
-                        else -> FluxAccentMagenta
-                    },
-                    modifier = Modifier.size(24.dp)
-                )
+                    modifier = Modifier.size(24.dp))
             }
         }
 
         Spacer(Modifier.height(20.dp))
 
-        // Progress Glass Card
+        // Installation progress
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(colors.surface.copy(alpha = 0.75f))
-                .border(1.dp, FluxHairline, RoundedCornerShape(16.dp))
+                .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                .background(colors.surface)
+                .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                 .padding(16.dp)
         ) {
             Column {
@@ -189,62 +172,39 @@ fun InstallProgressPanel(
                 ) {
                     Text(
                         text = if (phaseLabel.isNotBlank()) phaseLabel else "Working…",
-                        fontWeight = FontWeight.SemiBold,
-                        color = colors.onSurface,
-                        fontSize = 15.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
+                        modifier = Modifier.weight(1f))
                     Spacer(Modifier.width(8.dp))
                     Text(
                         text = "$percent%",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = when {
-                            failed -> colors.error
-                            isDone -> Color(0xFF69F0AE)
-                            else -> FluxAccentMagenta
-                        }
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                 }
 
                 Spacer(Modifier.height(10.dp))
 
-                // Progress Bar with Gradient Look
+                // Installation progress
                 LinearProgressIndicator(
                     progress = { percent / 100f },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
-                    color = when {
-                        failed -> colors.error
-                        isDone -> Color(0xFF69F0AE)
-                        else -> FluxAccentMagenta
-                    },
-                    trackColor = colors.surfaceVariant.copy(alpha = 0.5f)
-                )
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.extraSmall))
 
                 if (detail.isNotBlank()) {
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = detail,
-                        fontSize = 12.sp,
-                        color = colors.onSurface.copy(alpha = 0.7f),
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                        overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
 
                 if (failed && errorMessage != null) {
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = errorMessage,
-                        color = colors.error,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -261,27 +221,16 @@ fun InstallProgressPanel(
                 Icon(
                     imageVector = Icons.Filled.Code,
                     contentDescription = null,
-                    tint = FluxAccentCyan,
-                    modifier = Modifier.size(16.dp)
-                )
+                    modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
                 Text(
-                    text = "Terminal Output",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = colors.onBackground.copy(alpha = 0.85f)
-                )
+                    text = "Terminal Output")
             }
 
             TextButton(
-                onClick = onToggleLog,
-                colors = ButtonDefaults.textButtonColors(contentColor = BrandCream)
-            ) {
+                onClick = onToggleLog) {
                 Text(
-                    if (showLog) "Hide Console" else "Show Console",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 13.sp
-                )
+                    if (showLog) "Hide Console" else "Show Console")
             }
         }
 
@@ -293,19 +242,16 @@ fun InstallProgressPanel(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(Color(0xFF0D0D11))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(14.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(12.dp)
                     .verticalScroll(logScroll)
             ) {
                 Text(
                     text = logText.ifBlank { "Initializing installation stream…" },
-                    color = if (logText.isBlank()) Color(0xFF78909C) else Color(0xFFCFD8DC),
-                    fontSize = 11.sp,
                     fontFamily = FontFamily.Monospace,
-                    lineHeight = 16.sp
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
         }
 
@@ -322,30 +268,21 @@ fun InstallProgressPanel(
                     onClick = onRetry,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BrandCream,
-                        contentColor = FluxDarkGrey
-                    ),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
+                        .height(52.dp)) {
                     Icon(
                         imageVector = Icons.Filled.Refresh,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
-                    )
+                        modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Retry Setup", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text("Retry Setup")
                 }
 
                 if (onBack != null) {
                     Spacer(Modifier.height(8.dp))
                     TextButton(
                         onClick = onBack,
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.textButtonColors(contentColor = BrandCream)
-                    ) {
-                        Text("Back to Configuration", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                        modifier = Modifier.fillMaxWidth()) {
+                        Text("Back to Configuration")
                     }
                 }
             }
@@ -355,14 +292,8 @@ fun InstallProgressPanel(
                     onClick = onDone,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(52.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = BrandCream,
-                        contentColor = FluxDarkGrey
-                    ),
-                    shape = RoundedCornerShape(14.dp)
-                ) {
-                    Text("Continue", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        .height(52.dp)) {
+                    Text("Continue")
                 }
             }
         }
@@ -378,17 +309,17 @@ fun InstallThemePickRow(
     selected: Boolean,
     onSelect: () -> Unit
 ) {
-    val shape = RoundedCornerShape(14.dp)
+    val shape = androidx.compose.material3.MaterialTheme.shapes.medium
     val colors = MaterialTheme.colorScheme
-    val borderColor = if (selected) FluxAccentMagenta else FluxHairline
+    val borderColor = if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clip(shape)
             .background(
-                if (selected) FluxAccentMagenta.copy(alpha = 0.12f)
-                else colors.surface.copy(alpha = 0.75f)
+                if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                else colors.surface
             )
             .border(if (selected) 1.5.dp else 1.dp, borderColor, shape)
             .clickable(onClick = onSelect)
@@ -397,26 +328,15 @@ fun InstallThemePickRow(
     ) {
         RadioButton(
             selected = selected,
-            onClick = onSelect,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = FluxAccentMagenta,
-                unselectedColor = colors.onSurface.copy(alpha = 0.4f)
-            )
-        )
+            onClick = onSelect)
         Spacer(Modifier.width(8.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                color = colors.onSurface,
-                fontSize = 15.sp
-            )
+                text = title)
             Spacer(Modifier.height(2.dp))
             Text(
                 text = desc,
-                fontSize = 12.sp,
-                color = colors.onSurface.copy(alpha = 0.65f)
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
     }
 }

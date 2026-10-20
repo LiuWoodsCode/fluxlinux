@@ -42,25 +42,20 @@ import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.data.Distro
 import com.ivarna.fluxlinux.core.install.DistroInstallProfile
 import com.ivarna.fluxlinux.core.install.OnboardingInstallRunner
-import com.ivarna.fluxlinux.ui.components.GlassScaffold
+import com.ivarna.fluxlinux.ui.components.AppScaffold
 import com.ivarna.fluxlinux.ui.install.InstallProgressPanel
 import com.ivarna.fluxlinux.ui.install.InstallThemePickRow
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.hazeChild
-import dev.chrisbanes.haze.materials.ExperimentalHazeMaterialsApi
-import dev.chrisbanes.haze.materials.HazeMaterials
 
 /**
  * Thin install wizard: XFCE + customization only (no feature modules).
  * Uses [OnboardingInstallRunner] for both proot and chroot.
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalHazeMaterialsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InstallConfigScreen(
     distro: Distro,
     onBack: () -> Unit,
     onInstallComplete: () -> Unit,
-    hazeState: HazeState
 ) {
     val context = LocalContext.current
     val appCtx = context.applicationContext
@@ -106,8 +101,8 @@ fun InstallConfigScreen(
         onDispose { runner.cancel() }
     }
 
-    GlassScaffold(
-        hazeState = hazeState,
+    AppScaffold(
+
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -117,9 +112,7 @@ fun InstallConfigScreen(
                             InstallPhase.RUNNING -> if (failed) "Install failed" else "Installing…"
                             InstallPhase.DONE -> "Install complete"
                         },
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(
@@ -128,22 +121,13 @@ fun InstallConfigScreen(
                                 runner.cancel()
                             }
                             onBack()
-                        }
-                    ) {
+                        }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurface
-                        )
+                            contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent),
-                modifier = Modifier.hazeChild(
-                    state = hazeState,
-                    shape = androidx.compose.ui.graphics.RectangleShape,
-                    style = HazeMaterials.thin()
-                )
-            )
+                modifier = Modifier)
         },
         bottomBar = {
             if (phase == InstallPhase.OPTIONS) {
@@ -154,19 +138,12 @@ fun InstallConfigScreen(
                 ) {
                     Button(
                         onClick = { startInstall() },
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            // Cream secondary = readable CTA (dark primary blends into background)
-                            containerColor = MaterialTheme.colorScheme.secondary,
-                            contentColor = MaterialTheme.colorScheme.onSecondary
-                        ),
-                        shape = RoundedCornerShape(28.dp)
-                    ) {
+                        modifier = Modifier.fillMaxWidth().height(56.dp)) {
                         val cta = when {
                             distro.id.contains("chroot") -> "Install base desktop (Root)"
                             else -> "Install base desktop"
                         }
-                        Text(cta, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(cta)
                     }
                 }
             }
@@ -182,10 +159,7 @@ fun InstallConfigScreen(
             ) {
                 Text(
                     "Base desktop only",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold
-                )
+                    style = MaterialTheme.typography.titleMedium)
                 val profile = DistroInstallProfile.forId(distro.id)
                 val rootfsLine = when {
                     distro.id.startsWith("alpine") ->
@@ -202,15 +176,10 @@ fun InstallConfigScreen(
                 Text(
                     rootfsLine +
                         "App modules can be added later from Distro Settings.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                    style = MaterialTheme.typography.bodyMedium)
                 Text(
                     "Appearance theme",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary,
-                    fontWeight = FontWeight.Bold
-                )
+                    style = MaterialTheme.typography.titleSmall)
                 InstallThemePickRow(
                     id = "dark",
                     title = "Dark",
@@ -228,18 +197,14 @@ fun InstallConfigScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(16.dp))
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.90f))
-                        .border(1.dp, com.ivarna.fluxlinux.ui.theme.FluxHairline, RoundedCornerShape(16.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                        .background(MaterialTheme.colorScheme.surface)
+                        .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                         .padding(14.dp)
                 ) {
                     Column {
                         Text(
-                            "Includes",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                            "Includes")
                         Spacer(Modifier.height(6.dp))
                         val bulletColor = com.ivarna.fluxlinux.ui.theme.fluxMutedText()
                         Text(
@@ -254,23 +219,17 @@ fun InstallConfigScreen(
                                     "• openSUSE Tumbleweed rootfs"
                                 else ->
                                     "• ${profile?.displayName ?: distro.name} rootfs"
-                            },
-                            fontSize = 13.sp,
-                            color = bulletColor
-                        )
-                        Text("• XFCE4 desktop", fontSize = 13.sp, color = bulletColor)
+                            })
+                        Text("• XFCE4 desktop")
                         if (distro.id.startsWith("fedora") || distro.id.startsWith("void") ||
                             distro.id.startsWith("opensuse")
                         ) {
                             Text(
-                                "• Mesa / VirGL hardware acceleration",
-                                fontSize = 13.sp,
-                                color = bulletColor
-                            )
+                                "• Mesa / VirGL hardware acceleration")
                         }
-                        Text("• Flux theme / wallpapers / fonts", fontSize = 13.sp, color = bulletColor)
+                        Text("• Flux theme / wallpapers / fonts")
                         if (distro.id.contains("chroot")) {
-                            Text("• Requires root (KernelSU / Magisk)", fontSize = 13.sp, color = bulletColor)
+                            Text("• Requires root (KernelSU / Magisk)")
                         }
                     }
                 }

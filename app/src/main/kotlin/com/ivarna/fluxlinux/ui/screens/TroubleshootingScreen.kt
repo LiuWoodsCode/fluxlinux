@@ -19,9 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
-import dev.chrisbanes.haze.HazeState
-import dev.chrisbanes.haze.haze
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 
 data class TroubleshootingItem(
     val title: String,
@@ -33,8 +31,8 @@ data class TroubleshootingItem(
 fun TroubleshootingScreen(
     onBack: () -> Unit
 ) {
-    val hazeState = remember { HazeState() }
-    
+
+
     val issues = listOf(
         TroubleshootingItem("Termux Connection Failed", "Run the fix command from the Home screen connection panel. Ensure 'Allow External Apps' is true in ~/.termux/termux.properties."),
         TroubleshootingItem("GUI Not Starting", "Check if Termux:X11 is installed. Ensure you selected the correct display ID (usually 0). Try 'export DISPLAY=:0' in Termux."),
@@ -46,22 +44,17 @@ fun TroubleshootingScreen(
     Box(
         modifier = Modifier.fillMaxSize()
             .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
-            .haze(state = hazeState)
     ) {
         Scaffold(
-            containerColor = Color.Transparent,
             topBar = {
                 CenterAlignedTopAppBar(
-                    title = { Text("Troubleshooting", color = androidx.compose.material3.MaterialTheme.colorScheme.onBackground) },
+                    title = { Text("Troubleshooting") },
                     navigationIcon = {
                         IconButton(onClick = onBack) {
-                            Icon(Icons.Rounded.ArrowBack, "Back", tint = androidx.compose.material3.MaterialTheme.colorScheme.onBackground)
+                            Icon(Icons.Rounded.ArrowBack, "Back")
                         }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
-                )
-            }
-        ) { innerPadding ->
+                    })
+            }) { innerPadding ->
             LazyColumn(
                 contentPadding = innerPadding,
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -80,7 +73,7 @@ fun TroubleshootingScreen(
 fun ExpandableIssueCard(issue: TroubleshootingItem) {
     var expanded by remember { mutableStateOf(false) }
 
-    GlassSettingCard(
+    SettingsCard(
         onClick = { expanded = !expanded }
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -90,27 +83,17 @@ fun ExpandableIssueCard(issue: TroubleshootingItem) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = issue.title,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
+                    text = issue.title)
                 Icon(
                     imageVector = if (expanded) Icons.Rounded.KeyboardArrowUp else Icons.Rounded.KeyboardArrowDown,
-                    contentDescription = null,
-                    tint = androidx.compose.material3.MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
+                    contentDescription = null)
             }
-            
+
             AnimatedVisibility(visible = expanded) {
                 Column {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = issue.content,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 14.sp,
-                        lineHeight = 20.sp
-                    )
+                        text = issue.content)
                 }
             }
         }

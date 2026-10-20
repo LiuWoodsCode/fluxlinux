@@ -1,9 +1,6 @@
 package com.ivarna.fluxlinux.core.data
 
 import com.ivarna.fluxlinux.core.model.SupportedDistro
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
-import androidx.compose.ui.graphics.Color
 import com.ivarna.fluxlinux.R
 import java.util.Locale
 
@@ -241,7 +238,7 @@ object DistroRepository {
             id = "debian",
             name = "Debian",
             description = "The universal operating system. Stable and reliable.",
-            color = FluxAccentMagenta,
+
             iconRes = R.drawable.distro_debian,
             comingSoon = false,
             prootSupported = true,
@@ -254,7 +251,7 @@ object DistroRepository {
             id = "debian13_chroot",
             name = "Debian (Rooted)",
             description = "High-performance Debian 13 (Trixie) environment via Chroot (Requires Root).",
-            color = FluxAccentMagenta,
+
             iconRes = R.drawable.distro_debian,
             comingSoon = false,
             prootSupported = false,
@@ -267,7 +264,7 @@ object DistroRepository {
             id = "alpine",
             name = "Alpine",
             description = "Security-oriented, lightweight musl/apk Linux (proot).",
-            color = Color(0xFF0D597F),
+
             iconRes = R.drawable.distro_alpine,
             comingSoon = false,
             prootSupported = true,
@@ -280,7 +277,7 @@ object DistroRepository {
             id = "alpine_chroot",
             name = "Alpine (Rooted)",
             description = "Lightweight Alpine 3.24 chroot environment (Requires Root).",
-            color = Color(0xFF0D597F),
+
             iconRes = R.drawable.distro_alpine,
             comingSoon = false,
             prootSupported = false,
@@ -293,7 +290,7 @@ object DistroRepository {
             id = "fedora",
             name = "Fedora",
             description = "Fedora 44 with dnf/dnf5 and XFCE4 (proot).",
-            color = Color(0xFF294172),
+
             iconRes = R.drawable.distro_fedora,
             comingSoon = false,
             prootSupported = true,
@@ -305,7 +302,7 @@ object DistroRepository {
             id = "fedora_chroot",
             name = "Fedora (Rooted)",
             description = "Fedora 44 chroot environment (Requires Root).",
-            color = Color(0xFF294172),
+
             iconRes = R.drawable.distro_fedora,
             comingSoon = false,
             prootSupported = false,
@@ -317,7 +314,7 @@ object DistroRepository {
             id = "void",
             name = "Void",
             description = "Independent glibc/xbps rolling distro with XFCE4 (proot).",
-            color = Color(0xFF478061),
+
             iconRes = R.drawable.distro_void,
             comingSoon = false,
             prootSupported = true,
@@ -329,7 +326,7 @@ object DistroRepository {
             id = "void_chroot",
             name = "Void (Rooted)",
             description = "Void Linux chroot environment (Requires Root).",
-            color = Color(0xFF478061),
+
             iconRes = R.drawable.distro_void,
             comingSoon = false,
             prootSupported = false,
@@ -341,7 +338,7 @@ object DistroRepository {
             id = "opensuse",
             name = "openSUSE",
             description = "openSUSE Tumbleweed with zypper and XFCE4 (proot).",
-            color = Color(0xFF73BA25),
+
             iconRes = R.drawable.distro_opensuse,
             comingSoon = false,
             prootSupported = true,
@@ -353,7 +350,7 @@ object DistroRepository {
             id = "opensuse_chroot",
             name = "openSUSE (Rooted)",
             description = "openSUSE Tumbleweed chroot environment (Requires Root).",
-            color = Color(0xFF73BA25),
+
             iconRes = R.drawable.distro_opensuse,
             comingSoon = false,
             prootSupported = false,
@@ -365,7 +362,7 @@ object DistroRepository {
             id = "deepin",
             name = "Deepin",
             description = "Deepin 25 with apt and XFCE4 (proot).",
-            color = Color(0xFF2CA7F8),
+
             iconRes = R.drawable.distro_deepin,
             comingSoon = false,
             prootSupported = true,
@@ -377,7 +374,7 @@ object DistroRepository {
             id = "deepin_chroot",
             name = "Deepin (Rooted)",
             description = "Deepin 25 chroot environment (Requires Root).",
-            color = Color(0xFF2CA7F8),
+
             iconRes = R.drawable.distro_deepin,
             comingSoon = false,
             prootSupported = false,
@@ -389,7 +386,7 @@ object DistroRepository {
             id = "chimera",
             name = "Chimera",
             description = "Chimera Linux (musl, apk v3) with XFCE4 (proot).",
-            color = Color(0xFFFF6B35),
+
             iconRes = R.drawable.distro_chimera,
             comingSoon = false,
             prootSupported = true,
@@ -401,7 +398,7 @@ object DistroRepository {
             id = "chimera_chroot",
             name = "Chimera (Rooted)",
             description = "Chimera Linux chroot environment (Requires Root).",
-            color = Color(0xFFFF6B35),
+
             iconRes = R.drawable.distro_chimera,
             comingSoon = false,
             prootSupported = false,
@@ -413,7 +410,7 @@ object DistroRepository {
             id = "manjaro",
             name = "Manjaro",
             description = "Manjaro ARM with pacman and XFCE4 (proot).",
-            color = Color(0xFF35BF5C),
+
             iconRes = R.drawable.distro_manjaro,
             comingSoon = false,
             prootSupported = true,
@@ -425,7 +422,7 @@ object DistroRepository {
             id = "manjaro_chroot",
             name = "Manjaro (Rooted)",
             description = "Manjaro ARM chroot environment (Requires Root).",
-            color = Color(0xFF35BF5C),
+
             iconRes = R.drawable.distro_manjaro,
             comingSoon = false,
             prootSupported = false,
@@ -437,7 +434,7 @@ object DistroRepository {
             id = "ubuntu",
             name = "Ubuntu",
             description = "Ubuntu 26.04 with XFCE4 (proot).",
-            color = Color(0xFFE95420),
+
             iconRes = R.drawable.distro_ubuntu,
             comingSoon = false,
             prootSupported = true,
@@ -449,7 +446,7 @@ object DistroRepository {
             id = "ubuntu_chroot",
             name = "Ubuntu (Rooted)",
             description = "Ubuntu 26.04 chroot environment (Requires Root).",
-            color = Color(0xFFE95420),
+
             iconRes = R.drawable.distro_ubuntu,
             comingSoon = false,
             prootSupported = false,
@@ -461,7 +458,7 @@ object DistroRepository {
             id = "kali",
             name = "Kali",
             description = "Kali Rolling with XFCE4 (proot).",
-            color = Color(0xFF367BF5),
+
             iconRes = R.drawable.distro_kali,
             comingSoon = false,
             prootSupported = true,
@@ -473,7 +470,7 @@ object DistroRepository {
             id = "kali_chroot",
             name = "Kali (Rooted)",
             description = "Kali Rolling chroot environment (Requires Root).",
-            color = Color(0xFF367BF5),
+
             iconRes = R.drawable.distro_kali,
             comingSoon = false,
             prootSupported = false,
@@ -485,7 +482,7 @@ object DistroRepository {
             id = "parrot",
             name = "Parrot",
             description = "Parrot 7.2 with XFCE4 (proot).",
-            color = Color(0xFF00D9FF),
+
             iconRes = R.drawable.distro_parrot,
             comingSoon = false,
             prootSupported = true,
@@ -497,7 +494,7 @@ object DistroRepository {
             id = "parrot_chroot",
             name = "Parrot (Rooted)",
             description = "Parrot 7.2 chroot environment (Requires Root).",
-            color = Color(0xFF00D9FF),
+
             iconRes = R.drawable.distro_parrot,
             comingSoon = false,
             prootSupported = false,
@@ -509,7 +506,7 @@ object DistroRepository {
             id = "archlinux",
             name = "Arch",
             description = "Arch Linux ARM with XFCE4 (proot).",
-            color = Color(0xFF1793D1),
+
             iconRes = R.drawable.distro_arch,
             comingSoon = false,
             prootSupported = true,
@@ -521,7 +518,7 @@ object DistroRepository {
             id = "archlinux_chroot",
             name = "Arch (Rooted)",
             description = "Arch Linux ARM chroot environment (Requires Root).",
-            color = Color(0xFF1793D1),
+
             iconRes = R.drawable.distro_arch,
             comingSoon = false,
             prootSupported = false,
@@ -535,7 +532,7 @@ object DistroRepository {
             id = "adelie",
             name = "Adélie Linux",
             description = "Independent Linux distribution committed to integrity and simplicity.",
-            color = Color(0xFF9C27B0),
+
             iconRes = R.drawable.distro_adelie,
             comingSoon = true,
             prootSupported = false, // no i686 support
@@ -545,7 +542,7 @@ object DistroRepository {
             id = "artix",
             name = "Artix Linux",
             description = "Arch-based distribution without systemd.",
-            color = Color(0xFF10A0CC),
+
             iconRes = R.drawable.distro_artix,
             comingSoon = true,
             prootSupported = true, // aarch64 only
@@ -555,7 +552,7 @@ object DistroRepository {
             id = "backbox",
             name = "BackBox",
             description = "Ubuntu-based distribution for penetration testing.",
-            color = Color(0xFF000000),
+
             iconRes = R.drawable.distro_backbox,
             comingSoon = true,
             prootSupported = false, // Not in proot-distro
@@ -565,7 +562,7 @@ object DistroRepository {
             id = "centos_stream",
             name = "CentOS Stream",
             description = "Continuously delivered distro that tracks ahead of RHEL.",
-            color = Color(0xFF262577),
+
             iconRes = R.drawable.distro_centos_stream,
             comingSoon = true,
             prootSupported = false, // Not in proot-distro
@@ -576,7 +573,7 @@ object DistroRepository {
             id = "gentoo",
             name = "Gentoo",
             description = "Flexible, source-based Linux distribution.",
-            color = Color(0xFF54487A),
+
             iconRes = R.drawable.distro_gentoo,
             comingSoon = true,
             prootSupported = false, // Not in proot-distro
@@ -586,7 +583,7 @@ object DistroRepository {
             id = "openkylin",
             name = "OpenKylin",
             description = "Community-driven Linux distribution from China.",
-            color = Color(0xFF0066CC),
+
             iconRes = R.drawable.distro_openkylin,
             comingSoon = true,
             prootSupported = false, // Not in proot-distro
@@ -597,7 +594,7 @@ object DistroRepository {
             id = "rocky",
             name = "Rocky Linux",
             description = "Enterprise-grade Linux distribution.",
-            color = Color(0xFF10B981),
+
             iconRes = R.drawable.distro_rocky,
             comingSoon = true,
             prootSupported = true, // only 64bit

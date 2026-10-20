@@ -42,13 +42,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.data.Distro
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
 
-private val CardShape = RoundedCornerShape(14.dp)
-private val MethodProot = Color(0xFF00B8D4)
-private val MethodChroot = Color(0xFFE040FB)
-private val StatusRunning = Color(0xFF4CAF50)
-private val StatusStarting = Color(0xFFFFA000)
 
 fun Distro.isChrootCard(): Boolean =
     id.contains("chroot", ignoreCase = true) || (chrootSupported && !prootSupported)
@@ -76,31 +70,14 @@ fun DistroCard(
     modifier: Modifier = Modifier
 ) {
     val isChroot = distro.isChrootCard()
-    val methodColor = if (isChroot) MethodChroot else MethodProot
+    val methodColor = MaterialTheme.colorScheme.secondary
     val colors = MaterialTheme.colorScheme
     val showLogs = logsAvailable || isGuiStarting || isGuiRunning
 
-    Box(
+    androidx.compose.material3.OutlinedCard(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 5.dp)
-            .clip(CardShape)
-            .background(colors.surface.copy(alpha = 0.72f))
-            .border(BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.45f)), CardShape)
-    ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .matchParentSize()
-        ) {
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .fillMaxHeight()
-                    .width(3.dp)
-                    .background(methodColor)
-            )
-        }
+            .padding(horizontal = 16.dp, vertical = 8.dp)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,17 +90,15 @@ fun DistroCard(
                             contentDescription = "${distro.name} logo",
                             modifier = Modifier
                                 .size(36.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                         )
                     } else {
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
-                                .clip(RoundedCornerShape(8.dp))
+                                .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                                 .background(
-                                    Brush.linearGradient(
-                                        colors = listOf(colors.primary, colors.tertiary)
-                                    )
+                                    androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                                 )
                         )
                     }
@@ -134,60 +109,43 @@ fun DistroCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = distro.name.removeSuffix(" (Rooted)"),
-                                color = colors.onSurface,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.SemiBold,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
+                                modifier = Modifier.weight(1f, fill = false))
                             Spacer(modifier = Modifier.width(6.dp))
                             MethodChip(
-                                label = if (isChroot) "CHROOT" else "PROOT",
-                                color = methodColor
-                            )
+                                label = if (isChroot) "CHROOT" else "PROOT")
                             if (isInstalled && isChroot && !startEnabled) {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 MethodChip(
-                                    label = "NO ROOT",
-                                    color = colors.error
-                                )
+                                    label = "NO ROOT")
                             }
                             if (isInstalled && (isGuiRunning || isGuiStarting)) {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 MethodChip(
-                                    label = if (isGuiStarting) "STARTING" else "RUNNING",
-                                    color = if (isGuiStarting) StatusStarting else StatusRunning
-                                )
+                                    label = if (isGuiStarting) "STARTING" else "RUNNING")
                             }
                             if (distro.comingSoon) {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 MethodChip(
-                                    label = "SOON",
-                                    color = colors.secondary
-                                )
+                                    label = "SOON")
                             }
                         }
                         Text(
                             text = statusMessage ?: distro.id,
-                            color = if (statusIsError) colors.error else colors.onSurfaceVariant,
-                            fontSize = 11.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                            overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     if (isInstalled) {
                         IconButton(
                             onClick = onNavigateToSettings,
-                            modifier = Modifier.size(36.dp)
-                        ) {
+                            modifier = Modifier.size(36.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = "Settings",
-                                tint = colors.secondary,
-                                modifier = Modifier.size(20.dp)
-                            )
+                                modifier = Modifier.size(20.dp))
                         }
                     }
                 }
@@ -196,11 +154,9 @@ fun DistroCard(
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = distro.description,
-                        color = colors.onSurface.copy(alpha = 0.65f),
-                        fontSize = 12.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                        overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -219,10 +175,7 @@ fun DistroCard(
                             onInstall
                         },
                         enabled = !distro.comingSoon && (!isGlobalInstalling || isCurrentlyInstalling),
-                        containerColor = colors.secondary,
-                        contentColor = colors.onSecondary,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        modifier = Modifier.fillMaxWidth())
                 } else if (isGuiRunning || isGuiStarting) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -233,27 +186,18 @@ fun DistroCard(
                             icon = Icons.AutoMirrored.Filled.OpenInNew,
                             onClick = onOpenDisplay,
                             enabled = isGuiRunning || isGuiStarting,
-                            containerColor = FluxAccentCyan,
-                            contentColor = Color.Black,
-                            modifier = Modifier.weight(1f)
-                        )
+                            modifier = Modifier.weight(1f))
                         CompactAction(
                             label = "Stop",
                             icon = Icons.Default.Stop,
                             onClick = onStop,
-                            containerColor = com.ivarna.fluxlinux.ui.theme.FluxDanger,
-                            contentColor = Color.White,
-                            modifier = Modifier.weight(0.85f)
-                        )
+                            modifier = Modifier.weight(0.85f))
                         if (showLogs) {
                             CompactAction(
                                 label = "Logs",
                                 icon = Icons.AutoMirrored.Filled.Article,
                                 onClick = onViewLogs,
-                                containerColor = colors.secondaryContainer,
-                                contentColor = colors.onSecondaryContainer,
-                                modifier = Modifier.weight(0.85f)
-                            )
+                                modifier = Modifier.weight(0.85f))
                         }
                     }
                 } else {
@@ -266,19 +210,13 @@ fun DistroCard(
                             icon = Icons.Default.PlayArrow,
                             onClick = onNavigateToStart,
                             enabled = startEnabled,
-                            containerColor = colors.secondary,
-                            contentColor = colors.onSecondary,
-                            modifier = Modifier.weight(1.2f)
-                        )
+                            modifier = Modifier.weight(1.2f))
                         if (showLogs) {
                             CompactAction(
                                 label = "Logs",
                                 icon = Icons.AutoMirrored.Filled.Article,
                                 onClick = onViewLogs,
-                                containerColor = colors.secondaryContainer,
-                                contentColor = colors.onSecondaryContainer,
-                                modifier = Modifier.weight(1f)
-                            )
+                                modifier = Modifier.weight(1f))
                         }
                     }
                 }
@@ -300,68 +238,22 @@ fun MethodTabs(
     chrootEnabled: Boolean = true,
     horizontalPadding: Dp = 16.dp,
 ) {
-    val shape = RoundedCornerShape(12.dp)
-    val colors = MaterialTheme.colorScheme
     val prootText = if (prootCount != null) "$prootLabel  $prootCount" else prootLabel
     val chrootText = if (chrootCount != null) "$chrootLabel  $chrootCount" else chrootLabel
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = horizontalPadding)
-            .height(40.dp)
-            .clip(shape)
-            .background(colors.surface.copy(alpha = 0.72f))
-            .border(BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.45f)), shape)
+    androidx.compose.material3.TabRow(
+        selectedTabIndex = selected.ordinal,
+        modifier = modifier.fillMaxWidth().padding(horizontal = horizontalPadding)
     ) {
-        MethodTabSegment(
-            label = prootText,
+        androidx.compose.material3.Tab(
             selected = selected == MethodTab.PROOT,
-            accent = MethodProot,
             onClick = { onSelected(MethodTab.PROOT) },
-            modifier = Modifier.weight(1f)
+            text = { Text(prootText) }
         )
-        MethodTabSegment(
-            label = chrootText,
+        androidx.compose.material3.Tab(
             selected = selected == MethodTab.CHROOT,
-            accent = MethodChroot,
-            enabled = chrootEnabled,
             onClick = { onSelected(MethodTab.CHROOT) },
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-private fun MethodTabSegment(
-    label: String,
-    selected: Boolean,
-    accent: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-) {
-    val shape = RoundedCornerShape(11.dp)
-    val labelColor = when {
-        selected -> accent
-        !enabled -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-        else -> MaterialTheme.colorScheme.onSurfaceVariant
-    }
-    Box(
-        modifier = modifier
-            .fillMaxHeight()
-            .padding(3.dp)
-            .clip(shape)
-            .background(if (selected) accent.copy(alpha = 0.22f) else Color.Transparent)
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = label,
-            color = labelColor,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
-            fontSize = 13.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            enabled = chrootEnabled,
+            text = { Text(chrootText) }
         )
     }
 }
@@ -369,91 +261,53 @@ private fun MethodTabSegment(
 @Composable
 fun MethodChip(
     label: String,
-    color: Color,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .background(color.copy(alpha = 0.18f), RoundedCornerShape(4.dp))
-            .border(BorderStroke(1.dp, color.copy(alpha = 0.45f)), RoundedCornerShape(4.dp))
-            .padding(horizontal = 5.dp, vertical = 1.dp)
-    ) {
-        Text(
-            text = label,
-            color = color,
-            fontSize = 9.sp,
-            fontWeight = FontWeight.Bold,
-            letterSpacing = 0.4.sp,
-            maxLines = 1
-        )
-    }
+    modifier: Modifier = Modifier) {
+    Text(
+        text = label,
+        style = MaterialTheme.typography.labelSmall,
+        modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+    )
 }
 
 @Composable
 internal fun CompactAction(
     label: String,
     onClick: () -> Unit,
-    containerColor: Color,
-    contentColor: Color,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
-    enabled: Boolean = true
-) {
+    enabled: Boolean = true) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            disabledContainerColor = containerColor.copy(alpha = 0.35f),
-            disabledContentColor = contentColor.copy(alpha = 0.5f)
-        ),
-        shape = RoundedCornerShape(10.dp),
-        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
-        modifier = modifier.height(36.dp)
-    ) {
+        modifier = modifier) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(16.dp)
-            )
+                modifier = Modifier.size(16.dp))
             Spacer(modifier = Modifier.width(4.dp))
         }
         Text(
             text = label,
-            fontWeight = FontWeight.Bold,
-            fontSize = 13.sp,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+            overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
-fun GlassSettingCard(
+fun SettingsCard(
     modifier: Modifier = Modifier,
     delayMillis: Int = 0,
     onClick: (() -> Unit)? = null,
     content: @Composable () -> Unit
 ) {
-    val shape = RoundedCornerShape(24.dp)
-    
-    Box(
-        modifier = modifier
-            .clip(shape)
-            .background(
-                androidx.compose.material3.MaterialTheme.colorScheme.surface.copy(alpha = 0.90f)
-            ) 
-            .then(
-                if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier
-            )
-            .border(
-                1.dp,
-                com.ivarna.fluxlinux.ui.theme.FluxHairline,
-                shape
-            )
-    ) {
-        content()
+    if (onClick != null) {
+        androidx.compose.material3.OutlinedCard(onClick = onClick, modifier = modifier) {
+            content()
+        }
+    } else {
+        androidx.compose.material3.OutlinedCard(modifier = modifier) {
+            content()
+        }
     }
 }

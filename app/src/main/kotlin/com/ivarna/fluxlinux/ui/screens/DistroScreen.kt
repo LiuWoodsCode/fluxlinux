@@ -23,12 +23,9 @@ import com.ivarna.fluxlinux.core.utils.StateManager
 import com.ivarna.fluxlinux.ui.components.DistroCard
 import com.ivarna.fluxlinux.ui.components.MethodTab
 import com.ivarna.fluxlinux.ui.components.MethodTabs
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
-import com.ivarna.fluxlinux.ui.theme.GlassWhiteMedium
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import dev.chrisbanes.haze.HazeState
 
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -37,16 +34,16 @@ import androidx.compose.foundation.lazy.items
 @Composable
 fun DistroScreen(
     permissionState: PermissionState,
-    hazeState: HazeState,
+
     onStartService: (android.content.Intent) -> Unit,
     onStartActivity: (android.content.Intent) -> Unit,
     onNavigateToInstall: (com.ivarna.fluxlinux.core.data.Distro) -> Unit
 ) {
     val context = LocalContext.current
-    
+
     val installState by InstallationQueueManager.installState.collectAsState()
     val stateRefresh by StateManager.refreshTrigger.collectAsState()
-    
+
     // Refresh mechanism to check install status
     val refreshKey = remember { mutableStateOf(0) }
     val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
@@ -60,7 +57,7 @@ fun DistroScreen(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    
+
     // Distro List — installed state = filesystem truth (plan P4-T13); stale
     // prefs without a rootfs on disk keep the card available for Install.
     val installedDistroIds = remember(refreshKey.value, stateRefresh) {
@@ -69,8 +66,8 @@ fun DistroScreen(
             .map { it.id }
             .toSet()
     }
-    
-    val availableDistros = DistroRepository.supportedDistros.filter { 
+
+    val availableDistros = DistroRepository.supportedDistros.filter {
         !installedDistroIds.contains(it.id)
     }
 
@@ -86,19 +83,17 @@ fun DistroScreen(
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = PaddingValues(bottom = 128.dp)
+        contentPadding = PaddingValues(bottom = 16.dp)
     ) {
         item(key = "title") {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Available Distros",
-                    color = MaterialTheme.colorScheme.secondary,
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                )
+                        .padding(horizontal = 16.dp))
                 Spacer(modifier = Modifier.height(10.dp))
             }
         }
@@ -131,9 +126,7 @@ fun DistroScreen(
                         } else {
                             "No PRoot distros left to install"
                         },
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
+                        style = MaterialTheme.typography.bodyLarge)
                 }
             }
         } else {

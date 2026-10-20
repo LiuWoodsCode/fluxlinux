@@ -55,7 +55,7 @@ import com.ivarna.fluxlinux.core.chroot.ChrootSettingsModel
 import com.ivarna.fluxlinux.core.chroot.GuestStorageCatalog
 import com.ivarna.fluxlinux.core.data.DistroRepository
 import com.ivarna.fluxlinux.core.root.ChrootPaths
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import com.ivarna.fluxlinux.ui.screens.storage.MetaRow
 import com.ivarna.fluxlinux.ui.screens.storage.StatusBadge
 import kotlinx.coroutines.Dispatchers
@@ -254,15 +254,13 @@ fun ChrootStorageDetailScreen(
                 if (isUniversal) {
                     Text(
                         ChrootSettingsModel.confirmKillCopy(allPaths) +
-                            if (procUi.count > 0) "\n\nDetected: ${procUi.count} process(es)." else ""
-                    )
+                            if (procUi.count > 0) "\n\nDetected: ${procUi.count} process(es)." else "")
                 } else {
                     Text(
                         "Sends SIGKILL to every process whose root is $path.\n\n" +
                             "Open chroot shells and guest daemons will die. Host Android processes " +
                             "are not targeted.\n\nRootfs and mounts stay." +
-                            if (procUi.count > 0) "\n\nDetected: ${procUi.count} process(es)." else ""
-                    )
+                            if (procUi.count > 0) "\n\nDetected: ${procUi.count} process(es)." else "")
                 }
             },
             confirmButton = {
@@ -270,41 +268,29 @@ fun ChrootStorageDetailScreen(
                     onClick = {
                         showKillConfirm = false
                         killAll()
-                    }
-                ) { Text("Kill all", color = MaterialTheme.colorScheme.error) }
+                    }) { Text("Kill all") }
             },
             dismissButton = {
                 TextButton(onClick = { showKillConfirm = false }) { Text("Cancel") }
-            }
-        )
+            })
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         pageTitle,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -320,36 +306,28 @@ fun ChrootStorageDetailScreen(
 
             Text(
                 pageSubtitle,
-                fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
-                color = muted
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
 
             // ── Storage & auto-detect ─────────────────────────────────────
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(18.dp).fillMaxWidth()) {
                     Text(
-                        "Storage & manage",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = accent
-                    )
+                        "Storage & manage")
                     Spacer(Modifier.height(8.dp))
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                Color(0x33FF9800),
-                                RoundedCornerShape(8.dp)
+                                androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                                androidx.compose.material3.MaterialTheme.shapes.small
                             )
                             .padding(12.dp)
                     ) {
                         Text(
                             "Rootfs is not removed when you uninstall the app. Free space here.",
-                            fontSize = 12.sp,
-                            color = Color(0xFFFFCC80)
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -392,8 +370,8 @@ fun ChrootStorageDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
-                                RoundedCornerShape(12.dp)
+                                MaterialTheme.colorScheme.surface,
+                                androidx.compose.material3.MaterialTheme.shapes.medium
                             )
                             .padding(14.dp)
                     ) {
@@ -403,57 +381,40 @@ fun ChrootStorageDetailScreen(
                         ) {
                             Text(
                                 "LINUX STORAGE",
-                                fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold,
-                                color = label,
-                                modifier = Modifier.weight(1f)
-                            )
+                                modifier = Modifier.weight(1f),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             IconButton(
                                 onClick = { refreshSizeOnly() },
-                                enabled = !busy
-                            ) {
+                                enabled = !busy) {
                                 Icon(
                                     Icons.Default.Refresh,
-                                    contentDescription = "Refresh size",
-                                    tint = accent
-                                )
+                                    contentDescription = "Refresh size")
                             }
                         }
                         if (sizeUi.measuring || busy && sizeUi.bytes == null) {
                             LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = accent,
-                                trackColor = accent.copy(alpha = 0.2f)
-                            )
+                                modifier = Modifier.fillMaxWidth())
                             Spacer(Modifier.height(8.dp))
                         }
                         val (v, u) = ChrootInfoStore.formatStorageBytes(sizeUi.bytes)
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
                                 v,
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
-                                color = accent,
-                                modifier = Modifier.alpha(if (sizeUi.dimmedCache) 0.85f else 1f)
-                            )
+                                modifier = Modifier.alpha(if (sizeUi.dimmedCache) 0.85f else 1f),
+            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
                             if (u.isNotEmpty()) {
                                 Text(
                                     " $u",
-                                    fontSize = 14.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = body,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
+                                    modifier = Modifier.padding(bottom = 4.dp))
                             }
                         }
                         Text(
                             sizeUi.hint,
-                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = muted
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -461,34 +422,27 @@ fun ChrootStorageDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.45f),
-                                RoundedCornerShape(10.dp)
+                                MaterialTheme.colorScheme.surface,
+                                androidx.compose.material3.MaterialTheme.shapes.small
                             )
                             .padding(12.dp)
                     ) {
                         Text(
                             if (isUniversal) "HOST PATHS (12 KNOWN)" else "HOST PATH",
-                            fontSize = 10.sp,
                             fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.SemiBold,
-                            color = label
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                         if (isUniversal) {
                             allPaths.forEach { p ->
                                 Text(
                                     "• $p",
-                                    fontSize = 11.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = body
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                         } else {
                             Text(
                                 path,
-                                fontSize = 12.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = body
-                            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                         }
                     }
 
@@ -496,44 +450,33 @@ fun ChrootStorageDetailScreen(
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { onNavigateToInstall() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = accent,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
-                            ),
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
-                        ) {
-                            Text("Install chroot", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                            Text("Install chroot")
                         }
                     }
                 }
             }
 
             // ── Processes / kill services ─────────────────────────────────
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(18.dp).fillMaxWidth()) {
                     Text(
-                        "Processes",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.error
-                    )
+                        "Processes")
                     Text(
                         if (isUniversal) {
                             "Orphans survive app close across all roots. Kill before uninstall if stuck."
                         } else {
                             "Orphans survive app close (unlike proot). Kill before uninstall if stuck."
                         },
-                        fontSize = 12.sp,
-                        color = muted,
-                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
-                    )
+                        modifier = Modifier.padding(top = 4.dp, bottom = 12.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
 
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
-                                RoundedCornerShape(12.dp)
+                                MaterialTheme.colorScheme.surface,
+                                androidx.compose.material3.MaterialTheme.shapes.medium
                             )
                             .padding(14.dp)
                     ) {
@@ -543,83 +486,56 @@ fun ChrootStorageDetailScreen(
                         ) {
                             Text(
                                 "CHROOT PROCESSES",
-                                fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold,
-                                color = label,
-                                modifier = Modifier.weight(1f)
-                            )
+                                modifier = Modifier.weight(1f),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             TextButton(onClick = { scanProcs() }, enabled = !busy) {
-                                Text("Scan", color = accent, fontWeight = FontWeight.SemiBold)
+                                Text("Scan")
                             }
                         }
                         if (procUi.scanning || procUi.killing) {
                             LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = MaterialTheme.colorScheme.error,
-                                trackColor = MaterialTheme.colorScheme.error.copy(alpha = 0.2f)
-                            )
+                                modifier = Modifier.fillMaxWidth())
                             Spacer(Modifier.height(8.dp))
                         }
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
                                 if (procUi.count < 0) "—" else procUi.count.toString(),
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
-                                color = if (procUi.count > 0) {
-                                    MaterialTheme.colorScheme.error
-                                } else {
-                                    accent
-                                }
-                            )
+            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
                             Text(
                                 " running",
-                                fontSize = 14.sp,
                                 fontFamily = FontFamily.Monospace,
-                                color = body,
-                                modifier = Modifier.padding(bottom = 4.dp, start = 6.dp)
-                            )
+                                modifier = Modifier.padding(bottom = 4.dp, start = 6.dp))
                         }
                         Text(
                             if (isUniversal) "roots=12 known · scan all catalog paths" else "root=$path",
-                            fontSize = 10.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = muted
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                         Text(
                             procUi.hint,
-                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = muted,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+                            modifier = Modifier.padding(top = 4.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
 
                         if (procUi.processes.isNotEmpty()) {
                             Spacer(Modifier.height(8.dp))
                             Text(
                                 "SAMPLE",
-                                fontSize = 10.sp,
                                 fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold,
-                                color = label
-                            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             procUi.processes.take(5).forEach { p ->
                                 Text(
                                     "${p.pid}  ${p.comm}",
-                                    fontSize = 11.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = body
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                             val more = procUi.processes.size - 5
                             if (more > 0) {
                                 Text(
                                     "+$more more",
-                                    fontSize = 10.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = muted
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                         }
                     }
@@ -637,20 +553,10 @@ fun ChrootStorageDetailScreen(
                         Button(
                             onClick = { showKillConfirm = true },
                             enabled = killEnabled,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.error,
-                                contentColor = MaterialTheme.colorScheme.onError,
-                                disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                disabledContentColor = muted
-                            ),
-                            modifier = Modifier.weight(1f).height(48.dp)
-                        ) {
+                            modifier = Modifier.weight(1f).height(48.dp)) {
                             if (procUi.killing) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(18.dp),
-                                    strokeWidth = 2.dp,
-                                    color = Color.White
-                                )
+                                    modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
                             }
                             val killText = if (killProgress != null) {
@@ -660,7 +566,7 @@ fun ChrootStorageDetailScreen(
                             } else {
                                 "Kill all chroot processes"
                             }
-                            Text(killText, fontWeight = FontWeight.Bold)
+                            Text(killText)
                         }
 
                         if (procUi.killing && isUniversal) {
@@ -668,11 +574,7 @@ fun ChrootStorageDetailScreen(
                             Button(
                                 onClick = { cancelKill() },
                                 enabled = !isCancelling,
-                                colors = ButtonDefaults.outlinedButtonColors(
-                                    contentColor = MaterialTheme.colorScheme.error
-                                ),
-                                modifier = Modifier.height(48.dp)
-                            ) {
+                                modifier = Modifier.height(48.dp)) {
                                 Text(if (isCancelling) "Cancelling…" else "Cancel")
                             }
                         }
@@ -681,11 +583,9 @@ fun ChrootStorageDetailScreen(
                     procUi.statusLine?.let {
                         Text(
                             it,
-                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = muted,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                            modifier = Modifier.padding(top = 8.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -693,15 +593,8 @@ fun ChrootStorageDetailScreen(
             Button(
                 onClick = { refreshAll(force = true) },
                 enabled = !busy,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = accent,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                    disabledContainerColor = com.ivarna.fluxlinux.ui.theme.FluxSwitchUncheckedTrack,
-                    disabledContentColor = com.ivarna.fluxlinux.ui.theme.FluxBodyMuted
-                ),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
-                Text("Refresh all", fontWeight = FontWeight.Bold)
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Text("Refresh all")
             }
 
             Spacer(Modifier.height(48.dp))

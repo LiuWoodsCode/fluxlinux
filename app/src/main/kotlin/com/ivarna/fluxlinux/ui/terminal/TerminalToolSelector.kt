@@ -54,12 +54,7 @@ import com.ivarna.fluxlinux.core.terminal.TerminalShellCatalog
 import com.ivarna.fluxlinux.ui.components.MethodChip
 import com.ivarna.fluxlinux.ui.components.MethodTab
 import com.ivarna.fluxlinux.ui.components.MethodTabs
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
 
-private val MethodProot = Color(0xFF00B8D4)
-private val MethodChroot = Color(0xFFE040FB)
-private val MethodHost = Color(0xFFF5E6CA)
-private val RowShape = RoundedCornerShape(14.dp)
 
 private data class TerminalMethodGroup(
     val title: String,
@@ -200,9 +195,9 @@ private fun displayName(card: TerminalShellCardUi): String {
 @Composable
 private fun TerminalSectionHeader(group: TerminalMethodGroup, modifier: Modifier = Modifier) {
     val accent = when (group.method) {
-        "chroot" -> MethodChroot
-        "host" -> MethodHost
-        else -> MethodProot
+        "chroot" -> androidx.compose.material3.MaterialTheme.colorScheme.tertiary
+        "host" -> androidx.compose.material3.MaterialTheme.colorScheme.primary
+        else -> androidx.compose.material3.MaterialTheme.colorScheme.secondary
     }
     Row(
         modifier = modifier
@@ -214,23 +209,17 @@ private fun TerminalSectionHeader(group: TerminalMethodGroup, modifier: Modifier
             modifier = Modifier
                 .width(3.dp)
                 .height(14.dp)
-                .clip(RoundedCornerShape(2.dp))
+                .clip(androidx.compose.material3.MaterialTheme.shapes.extraSmall)
                 .background(accent)
         )
         Spacer(Modifier.width(8.dp))
         Text(
             text = group.title,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Bold,
-            color = accent,
-            letterSpacing = 1.2.sp
-        )
+            style = MaterialTheme.typography.titleSmall)
         Spacer(Modifier.weight(1f))
         Text(
             text = group.subtitle,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+            style = MaterialTheme.typography.labelSmall)
     }
 }
 
@@ -241,9 +230,9 @@ private fun TerminalDistroRowCard(
     modifier: Modifier = Modifier
 ) {
     val methodColor = when (row.method) {
-        "chroot" -> MethodChroot
-        "host" -> MethodHost
-        else -> MethodProot
+        "chroot" -> androidx.compose.material3.MaterialTheme.colorScheme.tertiary
+        "host" -> androidx.compose.material3.MaterialTheme.colorScheme.primary
+        else -> androidx.compose.material3.MaterialTheme.colorScheme.secondary
     }
     val enabled = (row.user?.enabled == true) || (row.root?.enabled == true)
     val reason = row.user?.disabledReason ?: row.root?.disabledReason
@@ -252,17 +241,17 @@ private fun TerminalDistroRowCard(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RowShape)
+            .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
             .background(
-                if (enabled) colors.surface.copy(alpha = 0.78f)
-                else colors.surfaceVariant.copy(alpha = 0.38f)
+                if (enabled) colors.surface
+                else colors.surfaceVariant
             )
             .border(
                 BorderStroke(
                     1.dp,
-                    if (enabled) methodColor.copy(alpha = 0.35f) else colors.outlineVariant
+                    if (enabled) androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer else colors.outlineVariant
                 ),
-                RowShape
+                androidx.compose.material3.MaterialTheme.shapes.medium
             )
     ) {
         Row(
@@ -274,7 +263,7 @@ private fun TerminalDistroRowCard(
                 modifier = Modifier
                     .width(3.dp)
                     .fillMaxHeight()
-                    .background(if (enabled) methodColor else methodColor.copy(alpha = 0.3f))
+                    .background(if (enabled) methodColor else androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer)
             )
             Row(
                 modifier = Modifier
@@ -294,28 +283,19 @@ private fun TerminalDistroRowCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
                             text = row.name,
-                            color = if (enabled) colors.onSurface else colors.onSurfaceVariant,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
+                            modifier = Modifier.weight(1f, fill = false))
                         Spacer(Modifier.width(6.dp))
                         MethodChip(
-                            label = row.method.uppercase(),
-                            color = methodColor
-                        )
+                            label = row.method.uppercase())
                     }
                     if (!enabled && reason != null) {
                         Text(
                             text = reason,
-                            color = colors.error,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                            overflow = TextOverflow.Ellipsis,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
                 Spacer(Modifier.width(8.dp))
@@ -326,29 +306,20 @@ private fun TerminalDistroRowCard(
                                 label = "User",
                                 icon = Icons.Default.Person,
                                 enabled = row.user.enabled,
-                                containerColor = FluxAccentCyan,
-                                contentColor = Color.Black,
-                                onClick = { openCard(row.user, onOpen) }
-                            )
+                                onClick = { openCard(row.user, onOpen) })
                         }
                         SessionAction(
                             label = "Root",
                             icon = Icons.Default.AdminPanelSettings,
                             enabled = row.root.enabled,
-                            containerColor = Color(0xFFB71C1C),
-                            contentColor = Color.White,
-                            onClick = { openCard(row.root, onOpen) }
-                        )
+                            onClick = { openCard(row.root, onOpen) })
                     }
                 } else if (row.user != null) {
                     SessionAction(
                         label = "Open",
                         icon = Icons.Default.Terminal,
                         enabled = row.user.enabled,
-                        containerColor = MethodHost,
-                        contentColor = Color(0xFF1A1C1E),
-                        onClick = { openCard(row.user, onOpen) }
-                    )
+                        onClick = { openCard(row.user, onOpen) })
                 }
             }
         }
@@ -368,34 +339,20 @@ private fun SessionAction(
     label: String,
     icon: ImageVector,
     enabled: Boolean,
-    containerColor: Color,
-    contentColor: Color,
-    onClick: () -> Unit
-) {
+    onClick: () -> Unit) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-            disabledContainerColor = containerColor.copy(alpha = 0.28f),
-            disabledContentColor = contentColor.copy(alpha = 0.45f)
-        ),
-        shape = RoundedCornerShape(10.dp),
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 0.dp),
-        modifier = Modifier.height(36.dp)
-    ) {
+        modifier = Modifier.height(36.dp)) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(15.dp)
-        )
+            modifier = Modifier.size(15.dp))
         Spacer(Modifier.width(4.dp))
         Text(
             text = label,
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            maxLines = 1
-        )
+            maxLines = 1,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
     }
 }

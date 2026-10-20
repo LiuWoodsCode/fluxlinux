@@ -75,7 +75,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.ivarna.fluxlinux.R
 import com.ivarna.fluxlinux.core.system.SharedStorageAccess
 import com.ivarna.fluxlinux.core.utils.ThemeMode
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 
 /**
  * Settings hub (nativecode-style): nav cards open detail pages.
@@ -117,31 +117,21 @@ fun SettingsScreen(
     val context = LocalContext.current
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Settings",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -152,11 +142,7 @@ fun SettingsScreen(
         ) {
             Text(
                 "App",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
-            )
+                modifier = Modifier.padding(start = 4.dp, bottom = 2.dp))
 
             // F-Droid (ivarna) flavor only: its manifest declares the permission, Play's does not.
             if (SharedStorageAccess.declared(context)) {
@@ -234,50 +220,33 @@ fun SettingsScreen(
 
             Text(
                 "Help",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(start = 4.dp, top = 8.dp)
-            )
+                modifier = Modifier.padding(start = 4.dp, top = 8.dp))
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(
                     Modifier.padding(16.dp).fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     if (onNavigateToOnboarding != null) {
-                        // secondary = cream in dark theme — primary is near-black and vanishes on glass
+
                         Button(
                             onClick = { onNavigateToOnboarding() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
-                            ),
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
-                        ) {
-                            Text("Show onboarding", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                            Text("Show onboarding")
                         }
                     }
                     if (onNavigateToTroubleshooting != null) {
                         Button(
                             onClick = { onNavigateToTroubleshooting() },
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.secondary
-                            ),
-                            border = BorderStroke(
-                                1.5.dp,
-                                MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
-                            ),
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
-                        ) {
-                            Text("Troubleshoot", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                            Text("Troubleshoot")
                         }
                     }
                 }
             }
 
             // About
-            GlassSettingCard {
+            SettingsCard {
                 Column(
                     modifier = Modifier.fillMaxWidth().padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -286,7 +255,7 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(64.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF1A1A1A)),
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
@@ -299,44 +268,32 @@ fun SettingsScreen(
                     Spacer(Modifier.height(12.dp))
                     Text(
                         "FluxLinux",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                     Text(
-                        "v${com.ivarna.fluxlinux.BuildConfig.VERSION_NAME} • embedded terminal & X11",
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                        "v${com.ivarna.fluxlinux.BuildConfig.VERSION_NAME} • embedded terminal & X11")
                 }
             }
 
-            GlassSettingCard(
+            SettingsCard(
                 onClick = { openUrl(context, "https://github.com/abhay-byte/fluxlinux#readme") }
             ) {
                 Row(
                     Modifier.padding(20.dp).fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("📖", fontSize = 24.sp)
+                    Text("📖",
+            style = androidx.compose.material3.MaterialTheme.typography.headlineSmall)
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            "Read documentation",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                            "Read documentation")
                         Text(
-                            "Setup guides and tutorials",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
+                            "Setup guides and tutorials")
                     }
                 }
             }
 
-            GlassSettingCard(
+            SettingsCard(
                 onClick = { openUrl(context, "https://discord.gg/tag9kXAs2x") }
             ) {
                 Row(
@@ -347,42 +304,29 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF5865F2)),
+                            .background(androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_discord),
                             contentDescription = null,
-                            tint = Color.White,
-                            modifier = Modifier.size(22.dp)
-                        )
+                            modifier = Modifier.size(22.dp))
                     }
                     Spacer(Modifier.width(16.dp))
                     Column {
                         Text(
-                            "Join our Discord",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+                            "Join our Discord")
                         Text(
-                            "Help, setups, and features",
-                            fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                        )
+                            "Help, setups, and features")
                     }
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
                         "Special thanks",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+                        modifier = Modifier.padding(bottom = 8.dp))
                     listOf(
                         "Termux Team" to "https://github.com/termux",
                         "PRoot Distro" to "https://github.com/termux/proot-distro",
@@ -398,17 +342,15 @@ fun SettingsScreen(
                             Icon(
                                 Icons.Rounded.Favorite,
                                 null,
-                                tint = MaterialTheme.colorScheme.secondary,
-                                modifier = Modifier.size(16.dp)
-                            )
+                                modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(12.dp))
-                            Text(name, color = MaterialTheme.colorScheme.onSurface)
+                            Text(name)
                         }
                     }
                 }
             }
 
-            GlassSettingCard(onClick = { openUrl(context, "https://github.com/abhay-byte") }) {
+            SettingsCard(onClick = { openUrl(context, "https://github.com/abhay-byte") }) {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
@@ -429,21 +371,15 @@ fun SettingsScreen(
                         Column {
                             Text(
                                 "Abhay Raj",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+            style = androidx.compose.material3.MaterialTheme.typography.titleMedium)
                             Text(
-                                "@abhay-byte",
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
+                                "@abhay-byte")
                         }
                     }
                 }
             }
 
-            GlassSettingCard(
+            SettingsCard(
                 onClick = { openUrl(context, "https://github.com/abhay-byte/FluxLinux") }
             ) {
                 Row(
@@ -454,16 +390,10 @@ fun SettingsScreen(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_star),
                         contentDescription = null,
-                        tint = Color(0xFFFFD700),
-                        modifier = Modifier.size(22.dp)
-                    )
+                        modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(10.dp))
                     Text(
-                        "Star this repository",
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.secondary
-                    )
+                        "Star this repository")
                 }
             }
 
@@ -479,13 +409,13 @@ private fun SettingsNavCard(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    // Dark theme primary is near-black (filled surfaces); use secondary (cream) for icons.
+
     val iconTint = MaterialTheme.colorScheme.secondary
     val titleColor = MaterialTheme.colorScheme.onBackground
     val subtitleColor = MaterialTheme.colorScheme.onSurfaceVariant
-    val chevronColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f)
+    val chevronColor = MaterialTheme.colorScheme.onSurfaceVariant
 
-    GlassSettingCard(onClick = onClick) {
+    SettingsCard(onClick = onClick) {
         Row(
             modifier = Modifier
                 .padding(horizontal = 18.dp, vertical = 18.dp)
@@ -496,35 +426,25 @@ private fun SettingsNavCard(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)
-                    .background(iconTint.copy(alpha = 0.16f)),
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     icon,
                     contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(22.dp)
-                )
+                    modifier = Modifier.size(22.dp))
             }
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
                 Text(
-                    title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = titleColor
-                )
+                    title)
                 Text(
                     subtitle,
-                    fontSize = 12.sp,
-                    color = subtitleColor
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
             Icon(
                 Icons.AutoMirrored.Rounded.KeyboardArrowRight,
-                contentDescription = null,
-                tint = chevronColor
-            )
+                contentDescription = null)
         }
     }
 }

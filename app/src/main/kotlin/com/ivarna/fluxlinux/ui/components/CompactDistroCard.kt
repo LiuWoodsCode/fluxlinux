@@ -23,21 +23,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ivarna.fluxlinux.ui.theme.GlassBorder
 
 // Compact Distro Card for Coming Soon distros
 @Composable
 fun CompactDistroCard(
     distro: Distro
 ) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(androidx.compose.material3.MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-            .border(BorderStroke(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant), RoundedCornerShape(12.dp))
-    ) {
+    androidx.compose.material3.OutlinedCard(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
         Row(
             modifier = Modifier
                 .padding(horizontal = 12.dp, vertical = 10.dp)
@@ -51,43 +44,36 @@ fun CompactDistroCard(
                     contentDescription = "${distro.name} logo",
                     modifier = Modifier
                         .size(36.dp)
-                        .clip(RoundedCornerShape(6.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(12.dp))
-            
+
             // Distro Info
             Column(modifier = Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = distro.name,
-                        color = androidx.compose.material3.MaterialTheme.colorScheme.onSurface,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                    
+                        text = distro.name)
+
                     Spacer(modifier = Modifier.width(6.dp))
-                    
+
                     // Coming Soon badge
                     Box(
                         modifier = Modifier
                             .background(
                                 androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
-                                RoundedCornerShape(3.dp)
+                                androidx.compose.material3.MaterialTheme.shapes.extraSmall
                             )
                             .padding(horizontal = 5.dp, vertical = 2.dp)
                     ) {
                         Text(
                             text = "SOON",
-                            color = androidx.compose.material3.MaterialTheme.colorScheme.onSecondaryContainer,
-                            fontSize = 9.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
-            
+
             // Compatibility badges
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 // PRoot Badge
@@ -95,33 +81,27 @@ fun CompactDistroCard(
                     modifier = Modifier
                         .background(
                             if (distro.prootSupported) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(3.dp)
+                            androidx.compose.material3.MaterialTheme.shapes.extraSmall
                         )
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "P",
-                        color = if (distro.prootSupported) androidx.compose.material3.MaterialTheme.colorScheme.onPrimaryContainer else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
-                
+
                 // Chroot Badge
                 Box(
                     modifier = Modifier
                         .background(
                             if (distro.chrootSupported) androidx.compose.material3.MaterialTheme.colorScheme.tertiaryContainer else androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(3.dp)
+                            androidx.compose.material3.MaterialTheme.shapes.extraSmall
                         )
                         .padding(horizontal = 6.dp, vertical = 3.dp)
                 ) {
                     Text(
                         text = "C",
-                        color = if (distro.chrootSupported) androidx.compose.material3.MaterialTheme.colorScheme.onTertiaryContainer else androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
         }

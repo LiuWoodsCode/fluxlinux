@@ -107,14 +107,6 @@ import com.ivarna.fluxlinux.ui.components.MethodTab
 import com.ivarna.fluxlinux.ui.components.MethodTabs
 import com.ivarna.fluxlinux.ui.components.isChrootCard
 import com.ivarna.fluxlinux.ui.install.InstallProgressPanel
-import com.ivarna.fluxlinux.ui.theme.BrandCream
-import com.ivarna.fluxlinux.ui.theme.FluxAccentCyan
-import com.ivarna.fluxlinux.ui.theme.FluxAccentMagenta
-import com.ivarna.fluxlinux.ui.theme.FluxDarkGrey
-import com.ivarna.fluxlinux.ui.theme.FluxDarkSurface
-import com.ivarna.fluxlinux.ui.theme.FluxBodyMuted
-import com.ivarna.fluxlinux.ui.theme.FluxHairline
-import com.ivarna.fluxlinux.ui.theme.FluxSwitchUncheckedTrack
 import com.ivarna.fluxlinux.ui.theme.fluxMutedText
 
 private enum class OnboardStep { Welcome, Consent, HostSetup, DistroPick, Options, Storage, Running, Done }
@@ -122,7 +114,7 @@ private enum class OnboardStep { Welcome, Consent, HostSetup, DistroPick, Option
 /**
  * Redesigned full first-run onboarding:
  * Welcome → Disclosure/Consent → Host Setup → Distro Selection → Options → Progress → Complete.
- * Installs rootfs + XFCE + customization with unified glassmorphic styling and responsive layouts.
+ * Installs rootfs + XFCE + customization with Material 3 components and responsive layouts.
  */
 @Composable
 fun OnboardingFlowScreen(
@@ -177,7 +169,7 @@ fun OnboardingFlowScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(FluxDarkSurface)
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
             .systemBarsPadding()
     ) {
         when (step) {
@@ -259,20 +251,15 @@ private fun WelcomePage(onNext: () -> Unit) {
                 .padding(top = 16.dp, bottom = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Glowing Logo Container
+            // App logo
             Box(
                 modifier = Modifier
                     .size(68.dp)
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.large)
                     .background(
-                        Brush.linearGradient(
-                            listOf(
-                                FluxAccentMagenta.copy(alpha = 0.25f),
-                                FluxAccentCyan.copy(alpha = 0.25f)
-                            )
-                        )
+                        androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                     )
-                    .border(1.dp, FluxHairline, RoundedCornerShape(20.dp)),
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.large),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -286,21 +273,14 @@ private fun WelcomePage(onNext: () -> Unit) {
 
             Text(
                 text = "FluxLinux",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = colors.onBackground,
-                letterSpacing = 0.5.sp
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
 
             Spacer(Modifier.height(6.dp))
 
             Text(
                 text = "Full Linux desktop on Android — no Termux app required",
-                fontSize = 14.sp,
                 textAlign = TextAlign.Center,
-                color = colors.onBackground.copy(alpha = 0.72f),
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
+                modifier = Modifier.padding(horizontal = 16.dp))
         }
 
         // Scrollable Features & Illustration Area
@@ -315,26 +295,20 @@ private fun WelcomePage(onNext: () -> Unit) {
             // Feature 1: PRoot & Chroot
             ModernFeatureCard(
                 icon = Icons.Filled.Storage,
-                iconTint = FluxAccentMagenta,
                 title = "PRoot & Chroot",
-                description = "No root required with PRoot mode, or run with full native speed via Chroot on rooted devices."
-            )
+                description = "No root required with PRoot mode, or run with full native speed via Chroot on rooted devices.")
 
             // Feature 2: Desktop & Themes
             ModernFeatureCard(
                 icon = Icons.Filled.DesktopWindows,
-                iconTint = FluxAccentCyan,
                 title = "XFCE4 Desktop",
-                description = "Pre-configured desktop experience with Flux glass themes, icons, wallpapers, and fonts."
-            )
+                description = "Pre-configured desktop experience with Flux glass themes, icons, wallpapers, and fonts.")
 
             // Feature 3: Integrated Terminal & X11
             ModernFeatureCard(
                 icon = Icons.Filled.Terminal,
-                iconTint = BrandCream,
                 title = "Embedded Terminal & X11",
-                description = "Built-in hardware accelerated X11 display and multi-tab terminal with Oh My Zsh integration."
-            )
+                description = "Built-in hardware accelerated X11 display and multi-tab terminal with Oh My Zsh integration.")
 
             Spacer(Modifier.height(4.dp))
 
@@ -343,9 +317,9 @@ private fun WelcomePage(onNext: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(max = 130.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.surface.copy(alpha = 0.45f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(16.dp)),
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium),
                 contentAlignment = Alignment.Center
             ) {
                 Image(
@@ -358,12 +332,7 @@ private fun WelcomePage(onNext: () -> Unit) {
                     modifier = Modifier
                         .fillMaxSize()
                         .background(
-                            Brush.verticalGradient(
-                                listOf(
-                                    Color.Transparent,
-                                    FluxDarkSurface.copy(alpha = 0.65f)
-                                )
-                            )
+                            androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                         )
                 )
             }
@@ -383,52 +352,20 @@ private fun WelcomePage(onNext: () -> Unit) {
 @Composable
 private fun ModernFeatureCard(
     icon: ImageVector,
-    iconTint: Color,
     title: String,
     description: String
 ) {
-    val colors = MaterialTheme.colorScheme
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(colors.surface.copy(alpha = 0.72f))
-            .border(1.dp, FluxHairline, RoundedCornerShape(14.dp))
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .size(42.dp)
-                .clip(RoundedCornerShape(10.dp))
-                .background(iconTint.copy(alpha = 0.15f))
-                .border(1.dp, iconTint.copy(alpha = 0.35f), RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
+    androidx.compose.material3.OutlinedCard(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconTint,
-                modifier = Modifier.size(22.dp)
-            )
-        }
-
-        Spacer(Modifier.width(14.dp))
-
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = colors.onSurface,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Spacer(Modifier.height(2.dp))
-            Text(
-                text = description,
-                color = colors.onSurface.copy(alpha = 0.68f),
-                fontSize = 12.5.sp,
-                lineHeight = 16.sp
-            )
+            Icon(icon, contentDescription = null)
+            Spacer(Modifier.width(16.dp))
+            Column {
+                Text(title, style = MaterialTheme.typography.titleMedium)
+                Text(description, style = MaterialTheme.typography.bodyMedium)
+            }
         }
     }
 }
@@ -466,9 +403,9 @@ private fun ConsentPage(onBack: () -> Unit, onNext: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.surface.copy(alpha = 0.72f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(16.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(18.dp)
             ) {
                 Column {
@@ -477,33 +414,23 @@ private fun ConsentPage(onBack: () -> Unit, onNext: () -> Unit) {
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(CircleShape)
-                                .background(FluxAccentMagenta.copy(alpha = 0.15f)),
+                                .background(androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.CloudDownload,
                                 contentDescription = null,
-                                tint = FluxAccentMagenta,
-                                modifier = Modifier.size(20.dp)
-                            )
+                                modifier = Modifier.size(20.dp))
                         }
                         Spacer(Modifier.width(12.dp))
                         Text(
-                            text = "F-Droid & Package Notice",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onSurface
-                        )
+                            text = "F-Droid & Package Notice")
                     }
 
                     Spacer(Modifier.height(12.dp))
 
                     Text(
-                        text = "The F-Droid APK is intentionally lightweight and does not bundle large Linux OS archives. To provide a complete Linux environment, FluxLinux downloads the required system components directly from GitHub Releases upon continuation:",
-                        color = colors.onSurface.copy(alpha = 0.75f),
-                        fontSize = 13.5.sp,
-                        lineHeight = 19.sp
-                    )
+                        text = "The F-Droid APK is intentionally lightweight and does not bundle large Linux OS archives. To provide a complete Linux environment, FluxLinux downloads the required system components directly from GitHub Releases upon continuation:")
 
                     Spacer(Modifier.height(14.dp))
 
@@ -568,25 +495,19 @@ private fun DownloadItemBadge(
 ) {
     Row(
         modifier = modifier
-            .clip(RoundedCornerShape(10.dp))
-            .background(FluxDarkSurface.copy(alpha = 0.8f))
-            .border(1.dp, FluxHairline, RoundedCornerShape(10.dp))
+            .clip(androidx.compose.material3.MaterialTheme.shapes.small)
+            .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
+            .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.small)
             .padding(horizontal = 10.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = title,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         Text(
             text = size,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Bold,
-            color = FluxAccentCyan
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
     }
 }
 
@@ -641,11 +562,7 @@ private fun HostSetupPage(onBack: () -> Unit, onNext: () -> Unit) {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Initialize the local embedded Linux prefix, PulseAudio server, and terminal toolchain before selecting your distribution.",
-                color = colors.onBackground.copy(alpha = 0.72f),
-                fontSize = 14.sp,
-                lineHeight = 19.sp
-            )
+                text = "Initialize the local embedded Linux prefix, PulseAudio server, and terminal toolchain before selecting your distribution.")
 
             Spacer(Modifier.height(16.dp))
 
@@ -653,9 +570,9 @@ private fun HostSetupPage(onBack: () -> Unit, onNext: () -> Unit) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.surface.copy(alpha = 0.75f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(16.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(18.dp)
             ) {
                 Column {
@@ -668,40 +585,30 @@ private fun HostSetupPage(onBack: () -> Unit, onNext: () -> Unit) {
                             Box(
                                 modifier = Modifier
                                     .size(40.dp)
-                                    .clip(RoundedCornerShape(10.dp))
+                                    .clip(androidx.compose.material3.MaterialTheme.shapes.small)
                                     .background(
-                                        if (bootstrapDone) Color(0xFF69F0AE).copy(alpha = 0.15f)
-                                        else FluxAccentMagenta.copy(alpha = 0.15f)
+                                        if (bootstrapDone) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+                                        else androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = if (bootstrapDone) Icons.Filled.CheckCircle else Icons.Filled.Memory,
                                     contentDescription = null,
-                                    tint = if (bootstrapDone) Color(0xFF69F0AE) else FluxAccentMagenta,
-                                    modifier = Modifier.size(22.dp)
-                                )
+                                    modifier = Modifier.size(22.dp))
                             }
                             Spacer(Modifier.width(12.dp))
                             Column {
                                 Text(
-                                    text = "Embedded Host Prefix",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = colors.onSurface
-                                )
+                                    text = "Embedded Host Prefix")
                                 Text(
                                     text = if (bootstrapDone) "Initialized & Ready" else "Requires Setup",
-                                    fontSize = 12.sp,
-                                    color = if (bootstrapDone) Color(0xFF69F0AE) else colors.onSurface.copy(alpha = 0.6f)
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                         }
 
                         MethodChip(
-                            label = if (bootstrapDone) "READY" else if (initializing) "EXTRACTING" else "PENDING",
-                            color = if (bootstrapDone) Color(0xFF69F0AE) else if (initializing) FluxAccentMagenta else Color(0xFFFFA000)
-                        )
+                            label = if (bootstrapDone) "READY" else if (initializing) "EXTRACTING" else "PENDING")
                     }
 
                     Spacer(Modifier.height(14.dp))
@@ -714,18 +621,13 @@ private fun HostSetupPage(onBack: () -> Unit, onNext: () -> Unit) {
                             ) {
                                 Text(
                                     text = statusText.ifBlank { "Extracting bootstrap…" },
-                                    fontSize = 12.sp,
-                                    color = colors.onSurface.copy(alpha = 0.75f),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.weight(1f)
-                                )
+                                    modifier = Modifier.weight(1f),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                                 Text(
                                     text = "${(progress * 100).toInt()}%",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = FluxAccentMagenta
-                                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             }
                             Spacer(Modifier.height(8.dp))
                             LinearProgressIndicator(
@@ -733,40 +635,24 @@ private fun HostSetupPage(onBack: () -> Unit, onNext: () -> Unit) {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(6.dp)
-                                    .clip(RoundedCornerShape(3.dp)),
-                                color = FluxAccentMagenta,
-                                trackColor = colors.surfaceVariant.copy(alpha = 0.5f)
-                            )
+                                    .clip(androidx.compose.material3.MaterialTheme.shapes.extraSmall))
                         }
                     } else if (!bootstrapDone) {
                         Text(
-                            text = "Tap below to extract the core userland files and start the embedded runtime.",
-                            fontSize = 12.5.sp,
-                            color = colors.onSurface.copy(alpha = 0.7f)
-                        )
+                            text = "Tap below to extract the core userland files and start the embedded runtime.")
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { startInit() },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(46.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = FluxAccentMagenta.copy(alpha = 0.20f),
-                                contentColor = Color.White
-                            ),
-                            border = BorderStroke(1.dp, FluxAccentMagenta.copy(alpha = 0.5f)),
-                            shape = RoundedCornerShape(12.dp)
-                        ) {
+                                .height(46.dp)) {
                             Icon(Icons.Filled.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Initialize Host", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text("Initialize Host")
                         }
                     } else {
                         Text(
-                            text = "Host environment is extracted and operational. PulseAudio and internal session services are active.",
-                            fontSize = 12.5.sp,
-                            color = colors.onSurface.copy(alpha = 0.7f)
-                        )
+                            text = "Host environment is extracted and operational. PulseAudio and internal session services are active.")
                     }
                 }
             }
@@ -881,27 +767,21 @@ private fun DistroPickPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colors.error.copy(alpha = 0.12f))
-                    .border(1.dp, colors.error.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.errorContainer)
+                    .border(1.dp, colors.errorContainer, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(12.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = Icons.Filled.Warning,
                         contentDescription = null,
-                        tint = colors.error,
-                        modifier = Modifier.size(20.dp)
-                    )
+                        modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(10.dp))
                     Text(
                         text = if (probingRoot) "Checking superuser access…"
                         else "Grant superuser to FluxLinux in Magisk/KernelSU, then tap Chroot again.",
-                        color = colors.error,
-                        fontSize = 12.5.sp,
-                        lineHeight = 16.sp,
-                        modifier = Modifier.weight(1f)
-                    )
+                        modifier = Modifier.weight(1f))
                 }
             }
         }
@@ -916,11 +796,7 @@ private fun DistroPickPage(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = "Available Distributions",
-                fontWeight = FontWeight.Bold,
-                color = colors.onBackground,
-                fontSize = 14.sp
-            )
+                text = "Available Distributions")
 
             installable.forEach { distro ->
                 ModernSelectableDistroCard(
@@ -933,11 +809,7 @@ private fun DistroPickPage(
             if (comingSoon.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    text = "Coming Soon",
-                    fontWeight = FontWeight.SemiBold,
-                    color = colors.onBackground.copy(alpha = 0.6f),
-                    fontSize = 13.sp
-                )
+                    text = "Coming Soon")
                 comingSoon.forEach { distro ->
                     CompactDistroCard(distro = distro)
                 }
@@ -977,30 +849,25 @@ private fun ModernSelectableDistroCard(
 ) {
     val colors = MaterialTheme.colorScheme
     val borderColor by animateColorAsState(
-        if (selected) FluxAccentMagenta else FluxHairline,
+        if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
         label = "border"
     )
-    val bgColor = if (selected) FluxAccentMagenta.copy(alpha = 0.12f)
-    else colors.surface.copy(alpha = 0.72f)
+    val bgColor = if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer
+    else colors.surface
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
             .background(bgColor)
-            .border(if (selected) 1.5.dp else 1.dp, borderColor, RoundedCornerShape(16.dp))
+            .border(if (selected) 1.5.dp else 1.dp, borderColor, androidx.compose.material3.MaterialTheme.shapes.medium)
             .clickable(onClick = onClick)
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = selected,
-            onClick = onClick,
-            colors = RadioButtonDefaults.colors(
-                selectedColor = FluxAccentMagenta,
-                unselectedColor = colors.onSurface.copy(alpha = 0.4f)
-            )
-        )
+            onClick = onClick)
 
         Spacer(Modifier.width(8.dp))
 
@@ -1010,7 +877,7 @@ private fun ModernSelectableDistroCard(
                 contentDescription = distro.name,
                 modifier = Modifier
                     .size(42.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.small)
             )
             Spacer(Modifier.width(12.dp))
         }
@@ -1021,23 +888,14 @@ private fun ModernSelectableDistroCard(
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = distro.name,
-                    fontWeight = FontWeight.Bold,
-                    color = colors.onSurface,
-                    fontSize = 15.5.sp
-                )
+                    text = distro.name)
                 MethodChip(
-                    label = if (distro.chrootSupported) "CHROOT" else "PROOT",
-                    color = if (distro.chrootSupported) Color(0xFFE040FB) else Color(0xFF00B8D4)
-                )
+                    label = if (distro.chrootSupported) "CHROOT" else "PROOT")
             }
             Spacer(Modifier.height(2.dp))
             Text(
                 text = distro.description,
-                color = colors.onSurface.copy(alpha = 0.68f),
-                fontSize = 12.sp,
-                lineHeight = 16.sp
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -1082,9 +940,9 @@ private fun OptionsPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(colors.surface.copy(alpha = 0.72f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(14.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(14.dp)
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -1098,27 +956,17 @@ private fun OptionsPage(
                     }
                     Column(Modifier.weight(1f)) {
                         Text(
-                            text = distro?.name ?: distroId,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 15.sp,
-                            color = colors.onSurface
-                        )
+                            text = distro?.name ?: distroId)
                         Text(
                             text = "Base XFCE4 desktop with Flux customizations",
-                            fontSize = 12.sp,
-                            color = colors.onSurface.copy(alpha = 0.65f)
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                 }
             }
 
             // Appearance Theme Selection
             Text(
-                text = "Appearance Theme",
-                fontWeight = FontWeight.Bold,
-                color = colors.onBackground,
-                fontSize = 14.sp
-            )
+                text = "Appearance Theme")
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1146,9 +994,9 @@ private fun OptionsPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.surface.copy(alpha = 0.75f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(16.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(16.dp)
             ) {
                 Column {
@@ -1156,16 +1004,10 @@ private fun OptionsPage(
                         Icon(
                             imageVector = Icons.Filled.Layers,
                             contentDescription = null,
-                            tint = FluxAccentCyan,
-                            modifier = Modifier.size(18.dp)
-                        )
+                            modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Package Manifest Included",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colors.onSurface
-                        )
+                            text = "Package Manifest Included")
                     }
 
                     Spacer(Modifier.height(10.dp))
@@ -1194,14 +1036,11 @@ private fun OptionsPage(
                                 modifier = Modifier
                                     .size(6.dp)
                                     .clip(CircleShape)
-                                    .background(FluxAccentMagenta)
+                                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary)
                             )
                             Spacer(Modifier.width(10.dp))
                             Text(
-                                text = item,
-                                fontSize = 12.5.sp,
-                                color = colors.onSurface.copy(alpha = 0.8f)
-                            )
+                                text = item)
                         }
                     }
                 }
@@ -1211,17 +1050,14 @@ private fun OptionsPage(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(colors.error.copy(alpha = 0.12f))
-                        .border(1.dp, colors.error.copy(alpha = 0.4f), RoundedCornerShape(12.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                        .background(colors.errorContainer)
+                        .border(1.dp, colors.errorContainer, androidx.compose.material3.MaterialTheme.shapes.medium)
                         .padding(12.dp)
                 ) {
                     Text(
                         text = "Rooted path: Magisk, KernelSU, or APatch superuser is required for Chroot guest execution.",
-                        color = colors.error,
-                        fontSize = 12.sp,
-                        lineHeight = 16.sp
-                    )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
 
@@ -1267,13 +1103,13 @@ private fun ThemeOptionCard(
     modifier: Modifier = Modifier
 ) {
     val colors = MaterialTheme.colorScheme
-    val borderColor = if (selected) FluxAccentMagenta else FluxHairline
+    val borderColor = if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(if (selected) FluxAccentMagenta.copy(alpha = 0.12f) else colors.surface.copy(alpha = 0.72f))
-            .border(if (selected) 1.5.dp else 1.dp, borderColor, RoundedCornerShape(14.dp))
+            .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+            .background(if (selected) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else colors.surface)
+            .border(if (selected) 1.5.dp else 1.dp, borderColor, androidx.compose.material3.MaterialTheme.shapes.medium)
             .clickable(onClick = onSelect)
             .padding(12.dp)
     ) {
@@ -1288,44 +1124,31 @@ private fun ThemeOptionCard(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(if (isDark) Color(0xFF1E1E24) else Color(0xFFE8EAF6))
-                        .border(1.dp, FluxHairline, CircleShape),
+                        .background(if (isDark) androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant else androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant)
+                        .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     if (selected) {
                         Icon(
                             imageVector = Icons.Filled.Check,
                             contentDescription = null,
-                            tint = if (isDark) FluxAccentMagenta else Color(0xFF1E1E24),
-                            modifier = Modifier.size(14.dp)
-                        )
+                            modifier = Modifier.size(14.dp))
                     }
                 }
 
                 RadioButton(
                     selected = selected,
                     onClick = onSelect,
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = FluxAccentMagenta,
-                        unselectedColor = colors.onSurface.copy(alpha = 0.4f)
-                    ),
-                    modifier = Modifier.size(20.dp)
-                )
+                    modifier = Modifier.size(20.dp))
             }
 
             Spacer(Modifier.height(10.dp))
 
             Text(
-                text = title,
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = colors.onSurface
-            )
+                text = title)
             Text(
                 text = desc,
-                fontSize = 11.sp,
-                color = colors.onSurface.copy(alpha = 0.6f)
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -1344,7 +1167,7 @@ private fun DonePage(
     val distro = DistroRepository.supportedDistros.find { it.id == distroId }
     val displayName = distro?.name?.removeSuffix(" (Rooted)") ?: distroId
     val isChroot = distro?.isChrootCard() == true
-    val methodColor = if (isChroot) Color(0xFFE040FB) else Color(0xFF00B8D4)
+    val methodColor = if (isChroot) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.primary
     val colors = MaterialTheme.colorScheme
 
     Column(
@@ -1360,16 +1183,11 @@ private fun DonePage(
             Box(
                 modifier = Modifier
                     .size(108.dp)
-                    .clip(RoundedCornerShape(32.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.extraLarge)
                     .background(
-                        Brush.linearGradient(
-                            listOf(
-                                colors.surface.copy(alpha = 0.85f),
-                                colors.surfaceVariant.copy(alpha = 0.6f)
-                            )
-                        )
+                        androidx.compose.material3.MaterialTheme.colorScheme.surfaceVariant
                     )
-                    .border(1.5.dp, FluxHairline, RoundedCornerShape(32.dp)),
+                    .border(1.5.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.extraLarge),
                 contentAlignment = Alignment.Center
             ) {
                 if (distro?.iconRes != null) {
@@ -1382,9 +1200,7 @@ private fun DonePage(
                     Icon(
                         imageVector = Icons.Filled.CheckCircle,
                         contentDescription = null,
-                        tint = Color(0xFF69F0AE),
-                        modifier = Modifier.size(52.dp)
-                    )
+                        modifier = Modifier.size(52.dp))
                 }
             }
 
@@ -1392,18 +1208,16 @@ private fun DonePage(
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(FluxDarkSurface)
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.background)
                     .padding(3.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF69F0AE)),
+                    .background(androidx.compose.material3.MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = null,
-                    tint = FluxDarkSurface,
-                    modifier = Modifier.size(18.dp)
-                )
+                    modifier = Modifier.size(18.dp))
             }
         }
 
@@ -1411,28 +1225,19 @@ private fun DonePage(
 
         Text(
             text = "You're Ready!",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.ExtraBold,
-            color = colors.onBackground
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.headlineMedium)
 
         Spacer(Modifier.height(8.dp))
 
         Text(
             text = "$displayName base desktop is installed. Launch your graphical session or open an interactive shell.",
             textAlign = TextAlign.Center,
-            color = colors.onBackground.copy(alpha = 0.72f),
-            fontSize = 14.5.sp,
-            lineHeight = 20.sp,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+            modifier = Modifier.padding(horizontal = 12.dp))
 
         Spacer(Modifier.height(14.dp))
 
         MethodChip(
-            label = if (isChroot) "CHROOT GUEST" else "PROOT GUEST",
-            color = methodColor
-        )
+            label = if (isChroot) "CHROOT GUEST" else "PROOT GUEST")
 
         Spacer(Modifier.height(32.dp))
 
@@ -1441,16 +1246,10 @@ private fun DonePage(
             onClick = onDesktop,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = BrandCream,
-                contentColor = FluxDarkGrey
-            ),
-            shape = RoundedCornerShape(14.dp)
-        ) {
+                .height(54.dp)) {
             Icon(Icons.Filled.DesktopWindows, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(Modifier.width(10.dp))
-            Text("Start Desktop", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("Start Desktop")
         }
 
         Spacer(Modifier.height(10.dp))
@@ -1460,17 +1259,10 @@ private fun DonePage(
             onClick = onTerminal,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = FluxAccentMagenta.copy(alpha = 0.20f),
-                contentColor = Color.White
-            ),
-            border = BorderStroke(1.dp, FluxAccentMagenta.copy(alpha = 0.5f)),
-            shape = RoundedCornerShape(14.dp)
-        ) {
+                .height(50.dp)) {
             Icon(Icons.Filled.Terminal, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(10.dp))
-            Text("Open Terminal", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+            Text("Open Terminal")
         }
 
         Spacer(Modifier.height(10.dp))
@@ -1480,17 +1272,10 @@ private fun DonePage(
             onClick = onHome,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colors.surface.copy(alpha = 0.6f),
-                contentColor = colors.onSurface
-            ),
-            border = BorderStroke(1.dp, FluxHairline),
-            shape = RoundedCornerShape(14.dp)
-        ) {
+                .height(48.dp)) {
             Icon(Icons.Filled.Home, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(8.dp))
-            Text("Go to Dashboard", fontWeight = FontWeight.SemiBold, fontSize = 14.5.sp)
+            Text("Go to Dashboard")
         }
     }
 }
@@ -1511,7 +1296,7 @@ private fun StoragePage(onBack: () -> Unit, onNext: () -> Unit) {
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val granted = remember(resumeKey) { SharedStorageAccess.granted() }
-    val success = Color(0xFF69F0AE)
+    val success = androidx.compose.material3.MaterialTheme.colorScheme.primary
 
     Column(
         modifier = Modifier
@@ -1533,31 +1318,25 @@ private fun StoragePage(onBack: () -> Unit, onNext: () -> Unit) {
                 modifier = Modifier
                     .size(84.dp)
                     .clip(CircleShape)
-                    .background((if (granted) success else FluxAccentMagenta).copy(alpha = 0.15f)),
+                    .background((if (granted) success else androidx.compose.material3.MaterialTheme.colorScheme.primary).copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.FolderShared,
                     contentDescription = "Shared storage",
-                    tint = if (granted) success else FluxAccentMagenta,
-                    modifier = Modifier.size(44.dp)
-                )
+                    modifier = Modifier.size(44.dp))
             }
 
             Text(
                 text = "Your Linux distros can read and write your phone's storage (/sdcard: Downloads, Documents, USB drives), so you can open and save files from Linux apps.",
-                color = colors.onSurface.copy(alpha = 0.75f),
-                fontSize = 13.5.sp,
-                lineHeight = 19.sp,
-                textAlign = TextAlign.Center
-            )
+                textAlign = TextAlign.Center)
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(colors.surface.copy(alpha = 0.72f))
-                    .border(1.dp, FluxHairline, RoundedCornerShape(16.dp))
+                    .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                    .background(colors.surface)
+                    .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant, androidx.compose.material3.MaterialTheme.shapes.medium)
                     .padding(18.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
@@ -1570,25 +1349,23 @@ private fun StoragePage(onBack: () -> Unit, onNext: () -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(success.copy(alpha = 0.12f))
-                        .border(1.dp, success.copy(alpha = 0.6f), RoundedCornerShape(14.dp))
+                        .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+                        .background(androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer)
+                        .border(1.dp, androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer, androidx.compose.material3.MaterialTheme.shapes.medium)
                         .semantics { liveRegion = LiveRegionMode.Polite }
                         .padding(14.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Icon(Icons.Filled.CheckCircle, contentDescription = null, tint = success, modifier = Modifier.size(22.dp))
+                    Icon(Icons.Filled.CheckCircle, contentDescription = null, modifier = Modifier.size(22.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Access granted", color = success, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                    Text("Access granted")
                 }
             } else {
                 Text(
                     text = "You can change this later in Settings > Shared storage.",
-                    color = colors.onSurface.copy(alpha = 0.6f),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
+                    textAlign = TextAlign.Center,
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
         }
 
@@ -1608,9 +1385,9 @@ private fun StoragePage(onBack: () -> Unit, onNext: () -> Unit) {
 @Composable
 private fun StorageBenefit(icon: ImageVector, text: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, contentDescription = null, tint = FluxAccentCyan, modifier = Modifier.size(22.dp))
+        Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp))
         Spacer(Modifier.width(12.dp))
-        Text(text, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+        Text(text)
     }
 }
 
@@ -1636,22 +1413,16 @@ private fun StepHeader(
         ) {
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.size(36.dp)
-            ) {
+                modifier = Modifier.size(36.dp)) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
-                    tint = BrandCream,
-                    modifier = Modifier.size(20.dp)
-                )
+                    modifier = Modifier.size(20.dp))
             }
 
             Text(
                 text = "Step $currentStep of $totalSteps",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = colors.onBackground.copy(alpha = 0.55f)
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         }
 
         Spacer(Modifier.height(6.dp))
@@ -1662,19 +1433,13 @@ private fun StepHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(4.dp)
-                .clip(RoundedCornerShape(2.dp)),
-            color = FluxAccentMagenta,
-            trackColor = colors.surfaceVariant.copy(alpha = 0.4f)
-        )
+                .clip(androidx.compose.material3.MaterialTheme.shapes.extraSmall))
 
         Spacer(Modifier.height(14.dp))
 
         Text(
             text = title,
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = colors.onBackground
-        )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
     }
 }
 
@@ -1691,34 +1456,25 @@ private fun FluxConsentCheckboxCard(
         "I understand this setup downloads the selected Linux distro rootfs from GitHub Releases. That archive is not in the base APK."
     }
     val colors = MaterialTheme.colorScheme
-    val borderColor = if (consented) FluxAccentMagenta else FluxHairline
+    val borderColor = if (consented) androidx.compose.material3.MaterialTheme.colorScheme.primary else androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(if (consented) FluxAccentMagenta.copy(alpha = 0.08f) else colors.surface.copy(alpha = 0.72f))
-            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
+            .clip(androidx.compose.material3.MaterialTheme.shapes.medium)
+            .background(if (consented) androidx.compose.material3.MaterialTheme.colorScheme.primaryContainer else colors.surface)
+            .border(1.dp, borderColor, androidx.compose.material3.MaterialTheme.shapes.medium)
             .clickable { onConsentChange(!consented) }
             .padding(14.dp),
         verticalAlignment = Alignment.Top
     ) {
         Checkbox(
             checked = consented,
-            onCheckedChange = onConsentChange,
-            colors = CheckboxDefaults.colors(
-                checkedColor = FluxAccentMagenta,
-                uncheckedColor = colors.onSurface.copy(alpha = 0.45f)
-            )
-        )
+            onCheckedChange = onConsentChange)
         Spacer(Modifier.width(8.dp))
         Text(
             text = body,
-            color = colors.onSurface.copy(alpha = 0.85f),
-            fontSize = 12.5.sp,
-            lineHeight = 17.sp,
-            modifier = Modifier.padding(top = 10.dp)
-        )
+            modifier = Modifier.padding(top = 10.dp))
     }
 }
 
@@ -1735,16 +1491,8 @@ private fun FluxPrimaryButton(
         enabled = enabled,
         modifier = modifier
             .fillMaxWidth()
-            .height(52.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = BrandCream,
-            contentColor = FluxDarkGrey,
-            disabledContainerColor = FluxSwitchUncheckedTrack,
-            disabledContentColor = FluxBodyMuted
-        ),
-        shape = RoundedCornerShape(14.dp)
-    ) {
-        Text(text, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            .height(52.dp)) {
+        Text(text)
         if (icon != null) {
             Spacer(Modifier.width(6.dp))
             Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -1760,10 +1508,8 @@ private fun FluxGhostButton(
 ) {
     TextButton(
         onClick = onClick,
-        modifier = modifier.height(52.dp),
-        colors = ButtonDefaults.textButtonColors(contentColor = BrandCream)
-    ) {
-        Text(text, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+        modifier = modifier.height(52.dp)) {
+        Text(text)
     }
 }
 

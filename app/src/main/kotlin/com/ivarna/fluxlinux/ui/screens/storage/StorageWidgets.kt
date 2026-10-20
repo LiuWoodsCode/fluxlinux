@@ -21,40 +21,34 @@ fun MetaRow(label: String, trailing: @Composable () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                RoundedCornerShape(10.dp)
+                MaterialTheme.colorScheme.surface,
+                androidx.compose.material3.MaterialTheme.shapes.small
             )
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             label.uppercase(),
-            fontSize = 12.sp,
             fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier.weight(1f)
-        )
+            modifier = Modifier.weight(1f),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
         trailing()
     }
 }
 
 @Composable
 fun StatusBadge(text: String, ok: Boolean) {
-    // primary is near-black in dark theme — use secondary (cream) for OK badges
+
     val accent = MaterialTheme.colorScheme.secondary
     val fg = if (ok) accent else MaterialTheme.colorScheme.error
     Text(
         text,
-        fontSize = 10.sp,
         fontFamily = FontFamily.Monospace,
-        fontWeight = FontWeight.Bold,
-        color = fg,
         modifier = Modifier
             .background(
-                fg.copy(alpha = 0.18f),
-                RoundedCornerShape(4.dp)
+                androidx.compose.material3.MaterialTheme.colorScheme.secondaryContainer,
+                androidx.compose.material3.MaterialTheme.shapes.extraSmall
             )
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-    )
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
 }

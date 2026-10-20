@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.sp
 import com.ivarna.fluxlinux.core.terminal.GuestLoginShell
 import com.ivarna.fluxlinux.core.utils.TerminalPreferences
 import com.ivarna.fluxlinux.ui.components.FluxSwitch
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import com.ivarna.fluxlinux.ui.theme.fluxMutedText
 
 /**
@@ -74,31 +74,21 @@ fun TerminalSettingsScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         "Terminal",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -107,21 +97,13 @@ fun TerminalSettingsScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(20.dp).fillMaxWidth()) {
                     Text(
-                        "Global terminal zoom",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                        "Global terminal zoom")
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        "Font size for the embedded terminal (pinch zoom also updates this).",
-                        fontSize = 13.sp,
-                        lineHeight = 20.sp,
-                        color = fluxMutedText()
-                    )
+                        "Font size for the embedded terminal (pinch zoom also updates this).")
                     Spacer(Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -139,20 +121,12 @@ fun TerminalSettingsScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        ) {
+                                .background(MaterialTheme.colorScheme.surfaceVariant)) {
                             Icon(Icons.Default.Remove, contentDescription = "Smaller")
                         }
                         Text(
                             "${fontSize} pt",
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                         val canIncrease = fontSize < TerminalPreferences.FONT_MAX
                         IconButton(
                             onClick = {
@@ -164,26 +138,19 @@ fun TerminalSettingsScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.surfaceVariant),
-                            colors = IconButtonDefaults.iconButtonColors(
-                                contentColor = MaterialTheme.colorScheme.onSurface,
-                                disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-                            )
-                        ) {
+                                .background(MaterialTheme.colorScheme.surfaceVariant)) {
                             Icon(Icons.Default.Add, contentDescription = "Larger")
                         }
                     }
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "Range ${TerminalPreferences.FONT_MIN}–${TerminalPreferences.FONT_MAX}",
-                        fontSize = 12.sp,
-                        color = fluxMutedText(),
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
-                    )
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Row(
                     modifier = Modifier
                         .padding(20.dp)
@@ -192,18 +159,10 @@ fun TerminalSettingsScreen(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "Extra keyboard rows",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                            "Extra keyboard rows")
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Show CTRL, ALT, ESC, arrows and symbols under the terminal.",
-                            fontSize = 13.sp,
-                            lineHeight = 20.sp,
-                            color = fluxMutedText()
-                        )
+                            "Show CTRL, ALT, ESC, arrows and symbols under the terminal.")
                     }
                     Spacer(Modifier.width(12.dp))
                     FluxSwitch(
@@ -216,7 +175,7 @@ fun TerminalSettingsScreen(
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Row(
                     modifier = Modifier
                         .padding(20.dp)
@@ -225,33 +184,22 @@ fun TerminalSettingsScreen(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "Guest login shell",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                            "Guest login shell")
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "On = zsh, off = bash. New proot/chroot Terminal sessions only; live tabs keep their shell.",
-                            fontSize = 13.sp,
-                            lineHeight = 20.sp,
-                            color = fluxMutedText()
-                        )
+                            "On = zsh, off = bash. New proot/chroot Terminal sessions only; live tabs keep their shell.")
                     }
                     Spacer(Modifier.width(12.dp))
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.18f))
+                            .clip(androidx.compose.material3.MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.secondaryContainer)
                             .padding(horizontal = 8.dp, vertical = 4.dp),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
                             text = if (guestShellZsh) "zsh" else "bash",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.secondary
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
                     Spacer(Modifier.width(8.dp))
                     FluxSwitch(
@@ -271,7 +219,7 @@ fun TerminalSettingsScreen(
                 }
             }
 
-            GlassSettingCard {
+            SettingsCard {
                 Row(
                     modifier = Modifier
                         .padding(20.dp)
@@ -280,18 +228,10 @@ fun TerminalSettingsScreen(
                 ) {
                     Column(Modifier.weight(1f)) {
                         Text(
-                            "Legacy proot launcher",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
+                            "Legacy proot launcher")
                         Spacer(Modifier.height(4.dp))
                         Text(
-                            "Open proot terminals through proot-distro (python). Slower; use only if the default launch fails.",
-                            fontSize = 13.sp,
-                            lineHeight = 20.sp,
-                            color = fluxMutedText()
-                        )
+                            "Open proot terminals through proot-distro (python). Slower; use only if the default launch fails.")
                     }
                     Spacer(Modifier.width(12.dp))
                     FluxSwitch(

@@ -47,7 +47,7 @@ import com.ivarna.fluxlinux.core.chroot.GuestStorageCatalog
 import com.ivarna.fluxlinux.core.data.DistroRepository
 import com.ivarna.fluxlinux.core.proot.ProotInfoStore
 import com.ivarna.fluxlinux.core.proot.ProotSettingsModel
-import com.ivarna.fluxlinux.ui.components.GlassSettingCard
+import com.ivarna.fluxlinux.ui.components.SettingsCard
 import com.ivarna.fluxlinux.ui.screens.storage.MetaRow
 import com.ivarna.fluxlinux.ui.screens.storage.StatusBadge
 import kotlinx.coroutines.Dispatchers
@@ -134,31 +134,21 @@ fun ProotStorageDetailScreen(
     }
 
     Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
                         pageTitle,
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                        style = MaterialTheme.typography.headlineSmall)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.Rounded.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onBackground
-                        )
+                            contentDescription = "Back")
                     }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent
-                )
-            )
-        }
-    ) { innerPadding ->
+                })
+        }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -174,37 +164,29 @@ fun ProotStorageDetailScreen(
 
             Text(
                 pageSubtitle,
-                fontSize = 11.sp,
                 fontFamily = FontFamily.Monospace,
-                color = muted
-            )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
 
             // Info banner
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        RoundedCornerShape(8.dp)
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        androidx.compose.material3.MaterialTheme.shapes.small
                     )
                     .padding(12.dp)
             ) {
                 Text(
                     "PRoot lives in app storage (container + rootfs) and is removed if you uninstall the app.",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
             }
 
             // Storage card
-            GlassSettingCard {
+            SettingsCard {
                 Column(Modifier.padding(18.dp).fillMaxWidth()) {
                     Text(
-                        "Container storage",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = accent
-                    )
+                        "Container storage")
                     Spacer(Modifier.height(12.dp))
 
                     MetaRow("Status") {
@@ -227,8 +209,8 @@ fun ProotStorageDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.55f),
-                                RoundedCornerShape(12.dp)
+                                MaterialTheme.colorScheme.surface,
+                                androidx.compose.material3.MaterialTheme.shapes.medium
                             )
                             .padding(14.dp)
                     ) {
@@ -238,57 +220,40 @@ fun ProotStorageDetailScreen(
                         ) {
                             Text(
                                 "PROOT STORAGE",
-                                fontSize = 11.sp,
                                 fontFamily = FontFamily.Monospace,
-                                fontWeight = FontWeight.SemiBold,
-                                color = label,
-                                modifier = Modifier.weight(1f)
-                            )
+                                modifier = Modifier.weight(1f),
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                             IconButton(
                                 onClick = { refreshSize() },
-                                enabled = !busy
-                            ) {
+                                enabled = !busy) {
                                 Icon(
                                     Icons.Default.Refresh,
-                                    contentDescription = "Refresh size",
-                                    tint = accent
-                                )
+                                    contentDescription = "Refresh size")
                             }
                         }
                         if (sizeUi.measuring || busy && sizeUi.bytes == null) {
                             LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth(),
-                                color = accent,
-                                trackColor = accent.copy(alpha = 0.2f)
-                            )
+                                modifier = Modifier.fillMaxWidth())
                             Spacer(Modifier.height(8.dp))
                         }
                         val (v, u) = ProotInfoStore.formatStorageBytes(sizeUi.bytes)
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
                                 v,
-                                fontSize = 32.sp,
-                                fontWeight = FontWeight.Bold,
                                 fontFamily = FontFamily.Monospace,
-                                color = accent,
-                                modifier = Modifier.alpha(if (sizeUi.dimmedCache) 0.85f else 1f)
-                            )
+                                modifier = Modifier.alpha(if (sizeUi.dimmedCache) 0.85f else 1f),
+            style = androidx.compose.material3.MaterialTheme.typography.headlineLarge)
                             if (u.isNotEmpty()) {
                                 Text(
                                     " $u",
-                                    fontSize = 14.sp,
                                     fontFamily = FontFamily.Monospace,
-                                    color = body,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
+                                    modifier = Modifier.padding(bottom = 4.dp))
                             }
                         }
                         Text(
                             sizeUi.hint,
-                            fontSize = 11.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = muted
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     Spacer(Modifier.height(12.dp))
@@ -296,37 +261,27 @@ fun ProotStorageDetailScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                MaterialTheme.colorScheme.surface.copy(alpha = 0.45f),
-                                RoundedCornerShape(10.dp)
+                                MaterialTheme.colorScheme.surface,
+                                androidx.compose.material3.MaterialTheme.shapes.small
                             )
                             .padding(12.dp)
                     ) {
                         Text(
                             "CONTAINER PATH",
-                            fontSize = 10.sp,
                             fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.SemiBold,
-                            color = label
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                         Text(
                             containerPath ?: "",
-                            fontSize = 12.sp,
                             fontFamily = FontFamily.Monospace,
-                            color = body
-                        )
+            style = androidx.compose.material3.MaterialTheme.typography.bodySmall)
                     }
 
                     if (!isUniversal && !sizeUi.installed && onNavigateToInstall != null) {
                         Spacer(Modifier.height(12.dp))
                         Button(
                             onClick = { onNavigateToInstall() },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = accent,
-                                contentColor = MaterialTheme.colorScheme.onSecondary
-                            ),
-                            modifier = Modifier.fillMaxWidth().height(48.dp)
-                        ) {
-                            Text("Install PRoot distro", fontWeight = FontWeight.Bold)
+                            modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                            Text("Install PRoot distro")
                         }
                     }
                 }
@@ -335,15 +290,8 @@ fun ProotStorageDetailScreen(
             Button(
                 onClick = { refreshSize() },
                 enabled = !busy,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = accent,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                    disabledContainerColor = com.ivarna.fluxlinux.ui.theme.FluxSwitchUncheckedTrack,
-                    disabledContentColor = com.ivarna.fluxlinux.ui.theme.FluxBodyMuted
-                ),
-                modifier = Modifier.fillMaxWidth().height(48.dp)
-            ) {
-                Text("Refresh size", fontWeight = FontWeight.Bold)
+                modifier = Modifier.fillMaxWidth().height(48.dp)) {
+                Text("Refresh size")
             }
 
             Spacer(Modifier.height(48.dp))
