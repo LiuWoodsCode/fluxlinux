@@ -101,8 +101,7 @@ fi
 export TERMUX_X11_APK_PATH
 echo "FluxLinux: APK path = $TERMUX_X11_APK_PATH"
 
-# Extract libXlorie.so from our APK to /data/data app lib dir
-# This is the only location app_process can dlopen without corrupting its linker namespace
+# Extract libXlorie.so to the app lib dir used by CmdEntryPoint's fallback.
 APP_LIB_DIR="/data/data/$PKG/lib"
 mkdir -p "$APP_LIB_DIR" 2>/dev/null
 # Re-extract when the APK is newer, else an app update keeps running the old X server.
@@ -119,6 +118,13 @@ if { [ ! -f "$APP_LIB_DIR/libXlorie.so" ] || [ "$TERMUX_X11_APK_PATH" -nt "$APP_
   ls -la "$APP_LIB_DIR/libXlorie.so" 2>/dev/null && \
     echo "FluxLinux: libXlorie.so ready in $APP_LIB_DIR" || \
     echo "FluxLinux: [WARN] libXlorie.so extraction failed"
+fi
+
+# ART rejects writable native libraries. Repair cached extractions as well as
+# fresh ones; unzip creates this file with owner-write permission (0600).
+if ! chmod 0500 "$APP_LIB_DIR/libXlorie.so"; then
+  echo "FluxLinux: [ERROR] Cannot make $APP_LIB_DIR/libXlorie.so read-only."
+  exit 1
 fi
 
 # Launch the X server via app_process

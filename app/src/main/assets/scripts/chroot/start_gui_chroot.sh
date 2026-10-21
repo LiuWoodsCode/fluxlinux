@@ -173,6 +173,13 @@ if { [ ! -f "$APP_LIB_DIR/libXlorie.so" ] || [ "$TERMUX_X11_APK_PATH" -nt "$APP_
   touch "$APP_LIB_DIR/libXlorie.so" 2>/dev/null # unzip keeps the 1981 entry mtime
 fi
 
+# ART rejects writable native libraries. Repair cached extractions as well as
+# fresh ones; unzip creates this file with owner-write permission (0600).
+if ! chmod 0500 "$APP_LIB_DIR/libXlorie.so"; then
+  echo "FluxLinux: [ERROR] Cannot make $APP_LIB_DIR/libXlorie.so read-only."
+  exit 1
+fi
+
 rm -f "$TMPDIR/.X0-lock" "$TMPDIR/.X1-lock" "$TMPDIR/.tX0-lock" \
   "$TMPDIR/.X11-unix/X0" "$TMPDIR/.X11-unix/X1" 2>/dev/null || true
 if [ -e "$TMPDIR/.X11-unix" ] && [ ! -d "$TMPDIR/.X11-unix" ]; then
