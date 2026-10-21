@@ -47,6 +47,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -59,6 +61,9 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun InstallProgressPanel(
     percent: Int,
+    phasePercent: Int?,
+    phaseIndex: Int,
+    phaseCount: Int,
     phaseLabel: String,
     detail: String,
     logText: String,
@@ -171,13 +176,13 @@ fun InstallProgressPanel(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = if (phaseLabel.isNotBlank()) phaseLabel else "Working…",
+                        text = "Overall progress",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f))
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        text = "$percent%",
+                        text = "${percent.coerceIn(0, 100)}%",
             style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
                 }
 
@@ -185,11 +190,59 @@ fun InstallProgressPanel(
 
                 // Installation progress
                 LinearProgressIndicator(
-                    progress = { percent / 100f },
+                    progress = { percent.coerceIn(0, 100) / 100f },
                     modifier = Modifier
+                        .semantics { contentDescription = "Overall installation progress" }
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(androidx.compose.material3.MaterialTheme.shapes.extraSmall))
+
+                Spacer(Modifier.height(18.dp))
+                Text(
+                    text = if (phaseCount > 0) "Current step · ${phaseIndex + 1} of $phaseCount" else "Current step",
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = phaseLabel.ifBlank { "Starting…" },
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = when {
+                            isDone -> "100%"
+                            failed -> "Stopped"
+                            phasePercent != null -> "${phasePercent.coerceIn(0, 100)}%"
+                            else -> "Working…"
+                        },
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+                Spacer(Modifier.height(8.dp))
+                val stepBarModifier = Modifier
+                    .semantics { contentDescription = "Current step progress" }
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(MaterialTheme.shapes.extraSmall)
+                if (phasePercent != null || failed || isDone) {
+                    LinearProgressIndicator(
+                        progress = { if (isDone) 1f else (phasePercent ?: 0).coerceIn(0, 100) / 100f },
+                        color = if (failed) colors.error else colors.secondary,
+                        modifier = stepBarModifier
+                    )
+                } else {
+                    LinearProgressIndicator(
+                        color = colors.secondary,
+                        modifier = stepBarModifier
+                    )
+                }
 
                 if (detail.isNotBlank()) {
                     Spacer(Modifier.height(8.dp))

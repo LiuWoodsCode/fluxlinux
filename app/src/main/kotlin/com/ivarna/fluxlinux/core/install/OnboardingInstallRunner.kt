@@ -39,6 +39,8 @@ class OnboardingInstallRunner(private val ctx: Context) {
         val phaseCount: Int,
         val overallPercent: Int,
         val detail: String,
+        /** null when the active command does not report a measurable fraction. */
+        val phasePercent: Int? = null,
         val logLine: String? = null,
         val failed: Boolean = false,
         val finished: Boolean = false,
@@ -57,6 +59,9 @@ class OnboardingInstallRunner(private val ctx: Context) {
     @Volatile private var lastNotifLabel: String = ""
     /** Last overall percent from real phase updates (log lines must not thrash). */
     @Volatile private var lastOverallPercent: Int = 0
+    @Volatile private var lastPhasePercent: Int? = null
+    @Volatile private var lastPhaseIndex: Int = 0
+    @Volatile private var lastDetail: String = ""
 
     fun cancel() {
         cancelled.set(true)
@@ -86,6 +91,9 @@ class OnboardingInstallRunner(private val ctx: Context) {
         activeProcess.getAndSet(null)?.destroyForcibly()
         cancelled.set(false)
         lastOverallPercent = 0
+        lastPhasePercent = null
+        lastPhaseIndex = 0
+        lastDetail = ""
         lastNotifPercent = -1
         lastNotifLabel = ""
 
@@ -188,7 +196,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
         var lastHostPhase = ""
         val hostOk = TerminalLauncher.prepareHostBlocking(appCtx, forceHostSetup = false) { done, total, phase ->
             if (isStale(gen)) return@prepareHostBlocking
-            val frac = if (total > 0) done.toFloat() / total else 0f
+            val frac = if (total > 0) done.toFloat() / total else null
             updateFraction(phases, hostIdx, frac, onProgress, phase)
             if (phase.isNotBlank() && phase != lastHostPhase) {
                 lastHostPhase = phase
@@ -211,7 +219,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
             isCancelled = { isStale(gen) }
         ) { p ->
             if (isStale(gen)) return@ensurePresent
-            val frac = if (p.totalBytes > 0) p.downloadedBytes.toFloat() / p.totalBytes else 0f
+            val frac = if (p.totalBytes > 0) p.downloadedBytes.toFloat() / p.totalBytes else null
             updateFraction(
                 phases, dlIdx, frac, onProgress,
                 "Downloaded ${p.downloadedBytes / 1_048_576} / " +
@@ -335,7 +343,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
         var lastHostPhase = ""
         val hostOk = TerminalLauncher.prepareHostBlocking(appCtx, forceHostSetup = false) { done, total, phase ->
             if (isStale(gen)) return@prepareHostBlocking
-            val frac = if (total > 0) done.toFloat() / total else 0f
+            val frac = if (total > 0) done.toFloat() / total else null
             updateFraction(phases, hostIdx, frac, onProgress, phase)
             if (phase.isNotBlank() && phase != lastHostPhase) {
                 lastHostPhase = phase
@@ -361,7 +369,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
             isCancelled = { isStale(gen) }
         ) { p ->
             if (isStale(gen)) return@ensurePresent
-            val frac = if (p.totalBytes > 0) p.downloadedBytes.toFloat() / p.totalBytes else 0f
+            val frac = if (p.totalBytes > 0) p.downloadedBytes.toFloat() / p.totalBytes else null
             updateFraction(
                 phases, dlIdx, frac, onProgress,
                 "Downloaded ${p.downloadedBytes / 1_048_576} / " +
@@ -649,6 +657,9 @@ class OnboardingInstallRunner(private val ctx: Context) {
         val p = phases[index]
         val pct = weightedPercent(phases, index, 0f)
         lastOverallPercent = pct
+        lastPhasePercent = null
+        lastPhaseIndex = index
+        lastDetail = detail
         post(
             onProgress,
             Progress(
@@ -672,6 +683,9 @@ class OnboardingInstallRunner(private val ctx: Context) {
         val p = phases[index]
         val pct = weightedPercent(phases, index, 1f)
         lastOverallPercent = pct
+        lastPhasePercent = 100
+        lastPhaseIndex = index
+        lastDetail = detail
         post(
             onProgress,
             Progress(
@@ -680,6 +694,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
                 phaseIndex = index,
                 phaseCount = phases.size,
                 overallPercent = pct,
+                phasePercent = 100,
                 detail = detail,
                 logLine = "✓ $detail"
             )
@@ -689,13 +704,17 @@ class OnboardingInstallRunner(private val ctx: Context) {
     private fun updateFraction(
         phases: List<BaseDesktopInstallPlan.Phase>,
         index: Int,
-        frac: Float,
+        frac: Float?,
         onProgress: (Progress) -> Unit,
         detail: String
     ) {
         val p = phases[index]
-        val pct = weightedPercent(phases, index, frac.coerceIn(0f, 1f))
+        val fraction = frac?.coerceIn(0f, 1f)
+        val pct = weightedPercent(phases, index, fraction ?: 0f)
         lastOverallPercent = pct
+        lastPhasePercent = fraction?.let { (it * 100).toInt() }
+        lastPhaseIndex = index
+        lastDetail = detail
         post(
             onProgress,
             Progress(
@@ -704,6 +723,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
                 phaseIndex = index,
                 phaseCount = phases.size,
                 overallPercent = pct,
+                phasePercent = lastPhasePercent,
                 detail = detail
             )
         )
@@ -725,7 +745,8 @@ class OnboardingInstallRunner(private val ctx: Context) {
                 phaseIndex = index,
                 phaseCount = phases.size,
                 overallPercent = lastOverallPercent.coerceIn(0, 100),
-                detail = p.label,
+                phasePercent = lastPhasePercent,
+                detail = lastDetail.ifBlank { p.label },
                 logLine = line
             )
         )
@@ -737,6 +758,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
     ) {
         val last = phases.last()
         lastOverallPercent = 100
+        lastPhasePercent = 100
         post(
             onProgress,
             Progress(
@@ -745,6 +767,7 @@ class OnboardingInstallRunner(private val ctx: Context) {
                 phaseIndex = phases.size - 1,
                 phaseCount = phases.size,
                 overallPercent = 100,
+                phasePercent = 100,
                 detail = "Environment ready",
                 finished = true
             )
@@ -756,15 +779,17 @@ class OnboardingInstallRunner(private val ctx: Context) {
         phases: List<BaseDesktopInstallPlan.Phase>,
         message: String
     ) {
-        val p = phases.firstOrNull()
+        val index = lastPhaseIndex.coerceIn(0, (phases.size - 1).coerceAtLeast(0))
+        val p = phases.getOrNull(index)
         post(
             onProgress,
             Progress(
                 phaseId = p?.id ?: "ERR",
                 phaseLabel = "Failed",
-                phaseIndex = 0,
+                phaseIndex = index,
                 phaseCount = phases.size.coerceAtLeast(1),
-                overallPercent = 0,
+                overallPercent = lastOverallPercent,
+                phasePercent = lastPhasePercent,
                 detail = message,
                 failed = true,
                 finished = true,

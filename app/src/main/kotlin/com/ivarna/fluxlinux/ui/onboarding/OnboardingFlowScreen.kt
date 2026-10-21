@@ -130,6 +130,9 @@ fun OnboardingFlowScreen(
     var username by remember { mutableStateOf("") }
 
     var percent by remember { mutableIntStateOf(0) }
+    var phasePercent by remember { mutableStateOf<Int?>(null) }
+    var phaseIndex by remember { mutableIntStateOf(0) }
+    var phaseCount by remember { mutableIntStateOf(0) }
     var phaseLabel by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf("") }
     var logText by remember { mutableStateOf("") }
@@ -145,6 +148,9 @@ fun OnboardingFlowScreen(
     fun startInstall() {
         step = OnboardStep.Running
         percent = 0
+        phasePercent = null
+        phaseIndex = 0
+        phaseCount = 0
         phaseLabel = "Starting…"
         detail = ""
         logText = ""
@@ -152,6 +158,9 @@ fun OnboardingFlowScreen(
         errorMessage = null
         runner.start(selectedDistroId, username) { p ->
             percent = p.overallPercent
+            phasePercent = p.phasePercent
+            phaseIndex = p.phaseIndex
+            phaseCount = p.phaseCount
             phaseLabel = p.phaseLabel
             detail = p.detail
             p.logLine?.let { line ->
@@ -209,6 +218,9 @@ fun OnboardingFlowScreen(
             )
             OnboardStep.Running -> InstallProgressPanel(
                 percent = percent,
+                phasePercent = phasePercent,
+                phaseIndex = phaseIndex,
+                phaseCount = phaseCount,
                 phaseLabel = phaseLabel,
                 detail = detail,
                 logText = logText,

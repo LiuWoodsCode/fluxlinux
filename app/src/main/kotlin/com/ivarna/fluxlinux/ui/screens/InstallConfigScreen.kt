@@ -63,6 +63,9 @@ fun InstallConfigScreen(
     var username by remember(distro.id) { mutableStateOf("") }
     var phase by remember { mutableStateOf(InstallPhase.OPTIONS) }
     var percent by remember { mutableIntStateOf(0) }
+    var phasePercent by remember { mutableStateOf<Int?>(null) }
+    var phaseIndex by remember { mutableIntStateOf(0) }
+    var phaseCount by remember { mutableIntStateOf(0) }
     var phaseLabel by remember { mutableStateOf("") }
     var detail by remember { mutableStateOf("") }
     var logText by remember { mutableStateOf("") }
@@ -76,12 +79,18 @@ fun InstallConfigScreen(
         failed = false
         errorMessage = null
         percent = 0
+        phasePercent = null
+        phaseIndex = 0
+        phaseCount = 0
         phaseLabel = "Starting…"
         detail = ""
         logText = ""
         phase = InstallPhase.RUNNING
         runner.start(distro.id, username) { progress ->
             percent = progress.overallPercent
+            phasePercent = progress.phasePercent
+            phaseIndex = progress.phaseIndex
+            phaseCount = progress.phaseCount
             phaseLabel = progress.phaseLabel
             detail = progress.detail
             progress.logLine?.let { line ->
@@ -219,6 +228,9 @@ fun InstallConfigScreen(
             }
             InstallPhase.RUNNING, InstallPhase.DONE -> InstallProgressPanel(
                 percent = percent,
+                phasePercent = phasePercent,
+                phaseIndex = phaseIndex,
+                phaseCount = phaseCount,
                 phaseLabel = phaseLabel,
                 detail = detail,
                 logText = logText,
